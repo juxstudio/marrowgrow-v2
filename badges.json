@@ -1,0 +1,107 @@
+{
+  "badges": {
+    "firstHarvest": {
+      "name": "First Harvest",
+      "description": "Complete your first grow",
+      "requirement": {
+        "type": "totalGrows",
+        "value": 1
+      },
+      "icon": "first-harvest.png"
+    },
+    "dailyGrinder": {
+      "name": "Daily Grinder",
+      "description": "Log in 5 consecutive days",
+      "requirement": {
+        "type": "consecutiveLogins",
+        "value": 5
+      },
+      "icon": "daily-grinder.png"
+    },
+    "seedCollector": {
+      "name": "Seed Collector",
+      "description": "Unlock 10 seed varieties",
+      "requirement": {
+        "type": "seedsUnlocked",
+        "value": 10
+      },
+      "icon": "seed-collector.png"
+    },
+    "slotMachineKing": {
+      "name": "Slot Machine King",
+      "description": "Win 10 times from daily slots",
+      "requirement": {
+        "type": "slotsWins",
+        "value": 10
+      },
+      "icon": "slot-king.png"
+    },
+    "greenThumb": {
+      "name": "Green Thumb",
+      "description": "Complete 10 perfect grows (90%+ potency, 50g+ weight)",
+      "requirement": {
+        "type": "perfectGrows",
+        "value": 10
+      },
+      "icon": "green-thumb.png"
+    },
+    "speedDemon": {
+      "name": "Speed Demon",
+      "description": "Complete a grow in under 2 minutes",
+      "requirement": {
+        "type": "fastestGrow",
+        "value": 120000
+      },
+      "icon": "speed-demon.png"
+    },
+    "yieldTitan": {
+      "name": "Yield Titan",
+      "description": "Reach 1000g total lifetime yield",
+      "requirement": {
+        "type": "totalYield",
+        "value": 1000
+      },
+      "icon": "yield-titan.png"
+    },
+    "dedicatedCultivator": {
+      "name": "Dedicated Cultivator",
+      "description": "Complete 50 total grows",
+      "requirement": {
+        "type": "totalGrows",
+        "value": 50
+      },
+      "icon": "dedicated-cultivator.png"
+    },
+    "weekendWarrior": {
+      "name": "Weekend Warrior",
+      "description": "Play 4 weekends in a row",
+      "requirement": {
+        "type": "weekendStreaks",
+        "value": 4
+      },
+      "icon": "weekend-warrior.png"
+    }
+  },
+  "tiers": {
+    "1": {
+      "name": "Rookie Grower",
+      "badgesRequired": 0,
+      "description": "Starting your journey"
+    },
+    "2": {
+      "name": "Experienced Grower",
+      "badgesRequired": 3,
+      "description": "Getting the hang of it"
+    },
+    "3": {
+      "name": "Expert Cultivator",
+      "badgesRequired": 6,
+      "description": "Master of the craft"
+    },
+    "4": {
+      "name": "Legendary Grower",
+      "badgesRequired": 9,
+      "description": "Elite status achieved"
+    }
+  }
+}

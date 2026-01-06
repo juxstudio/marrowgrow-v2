@@ -1,0 +1,3560 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  overflow: hidden;
+}
+
+.main-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  max-height: 100vh;
+  min-width: 1140px !important;
+  width: 100vw !important;
+  overflow-x: auto !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+}
+
+#seedSoilDisplay {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+@media (max-width: 700px) {
+  #seedSoilDisplay {
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+}
+
+@media (max-width: 500px) {
+  #seedSoilDisplay {
+    gap: 3px;
+    margin-bottom: 4px;
+  }
+}
+
+@media (max-height: 600px) {
+  #seedSoilDisplay {
+    gap: 3px;
+    margin-bottom: 4px;
+  }
+}
+
+@media (max-height: 500px) {
+  #seedSoilDisplay {
+    gap: 2px;
+    margin-bottom: 2px;
+  }
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 5px;
+  background-color: #18141a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  height: 100vh;
+  font-family: "Press Start 2P", "Courier New", Courier, monospace;
+  overflow: hidden;
+}
+
+.selection-screen,
+.game-container {
+  background-color: #23232b;
+  padding: 8px;
+  border-radius: 0;
+  box-shadow: 0 0 0 2px #18141a, 0 0 0 8px #000;
+  color: #e0e0e0;
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+  border: 2px solid #18141a;
+  max-height: 98vh;
+  overflow: hidden;
+}
+
+.selection-screen {
+  background: #23232b;
+  border-radius: 18px;
+  box-shadow: 0 6px 32px #000a, 0 0 0 2px #18141a;
+  color: #e0e0e0;
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: 98vh;
+  overflow: hidden;
+}
+
+.selection-grid {
+  display: inline-flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: flex-start;
+  width: auto;
+  margin-bottom: 6px;
+  flex: 1;
+  min-height: 0;
+  max-height: calc(98vh - 120px);
+}
+
+.selection-column {
+  background: rgba(35, 35, 43, 0.6);
+  border-radius: 12px;
+  padding: 4px 1px 4px 1px;
+  width: 140px;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 12px #000a;
+  border: 2px solid rgba(224, 224, 224, 0.08);
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.selection-column h2,
+.section-title,
+.main-title,
+.game-header h1,
+.harvest-content h2,
+.harvest-results h2,
+.results-content h2,
+.status-display h3,
+.notification-section h3 {
+  color: #e0e0e0 !important;
+  font-family: "Press Start 2P", "Courier New", Courier, monospace;
+  font-size: 1em;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px #000a;
+  width: 100%;
+}
+
+.seed-options,
+.soil-options,
+.defense-options {
+  display: grid !important;
+  grid-template-columns: 1fr;
+  gap: 3px;
+  width: 100%;
+  height: 100%;
+  justify-items: stretch;
+  align-items: stretch;
+  max-height: calc(98vh - 180px);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.seed-option,
+.soil-option,
+.defense-option {
+  background: none;
+  border-radius: 10px;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  border: none;
+  min-width: 0;
+  cursor: pointer;
+  transition: filter 0.2s ease, border-color 0.2s ease;
+  display: flex !important;
+  align-items: stretch;
+  justify-content: stretch;
+  position: relative;
+  overflow: hidden;
+}
+.seed-option.selected,
+.soil-option.selected,
+.defense-option.selected {
+  filter: none;
+  border: 2px solid #ffd700;
+  background: #23232b;
+}
+.seed-option:not(.selected),
+.soil-option:not(.selected),
+.defense-option:not(.selected) {
+  filter: grayscale(100%) brightness(0.3);
+  border: 2px solid transparent;
+}
+.seed-option:hover:not(.selected),
+.soil-option:hover:not(.selected),
+.defense-option:hover:not(.selected) {
+  filter: grayscale(50%) brightness(0.6);
+  border: 2px solid #bfcfff;
+}
+.seed-option:hover.selected,
+.soil-option:hover.selected,
+.defense-option:hover.selected {
+  filter: none;
+  border: 2px solid #ffd700;
+}
+
+.seed-img,
+.soil-img,
+.defense-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border: none;
+  margin: 0;
+  box-shadow: none;
+  border-radius: 0;
+  background: none;
+  position: static;
+}
+
+.seed-name,
+.soil-name {
+  background: rgba(24, 20, 26, 0.35);
+  color: #fff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.35em;
+  font-weight: bold;
+  text-align: center;
+  padding: 1px 0 1px 0;
+  border-radius: 0 0 6px 6px;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  letter-spacing: 0.5px;
+}
+
+.green-seed {
+  background-color: #2ecc71;
+  box-shadow: 0 0 10px #2ecc71;
+}
+
+.purple-seed {
+  background-color: #9b59b6;
+  box-shadow: 0 0 10px #9b59b6;
+}
+
+.orange-seed {
+  background-color: #e67e22;
+  box-shadow: 0 0 10px #e67e22;
+}
+
+.basic-soil {
+  background-color: #8b4513;
+  box-shadow: 0 0 10px #8b4513;
+}
+
+.premium-soil {
+  background-color: #654321;
+  box-shadow: 0 0 10px #654321;
+}
+
+.organic-soil {
+  background-color: #556b2f;
+  box-shadow: 0 0 10px #556b2f;
+}
+
+.seed-desc,
+.soil-desc {
+  color: #bdbdbd;
+  font-size: 0.95em;
+  margin-bottom: 0;
+  text-shadow: none;
+  font-family: "Press Start 2P", "Courier New", Courier, monospace;
+}
+
+.hidden {
+  display: none;
+}
+
+.game-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  background-color: #34495e;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  color: white;
+}
+
+.game-container > * {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.game-header {
+  margin-bottom: 20px;
+}
+
+.stage-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.progress-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.progress-section {
+  background-color: #23232b;
+  padding: 10px;
+  border-radius: 5px;
+  color: #e0e0e0;
+}
+
+.progress-label {
+  font-size: 1em;
+  color: #e0e0e0;
+  margin-bottom: 2px;
+  text-shadow: none;
+  font-family: "Press Start 2P", "Courier New", Courier, monospace;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 22px;
+  background: #18141a;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+  margin-top: 4px;
+  border: 2px solid #23232b;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #e0e0e0;
+  border-radius: 0;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: none;
+}
+
+.controls {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+button,
+.start-button {
+  background-color: #23232b;
+  border: 2px solid #e0e0e0;
+  color: #e0e0e0;
+  padding: 8px 16px;
+  border-radius: 0;
+  cursor: pointer;
+  font-family: "Press Start 2P", "Courier New", Courier, monospace;
+  font-size: 0.9em;
+  margin: 0 4px;
+  box-shadow: none;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  text-shadow: none;
+}
+
+.start-button {
+  background: #2ecc71;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  font-size: 0.9em;
+  font-family: "Press Start 2P", monospace;
+  cursor: pointer;
+  border-radius: 8px;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+
+.start-button:enabled {
+  background: #2ecc40 !important;
+  color: #fff !important;
+  border-color: #2ecc40 !important;
+  box-shadow: 0 0 16px 2px #2ecc40cc;
+}
+
+.start-button:disabled {
+  background: #23232b;
+  color: #bdbdbd;
+  cursor: not-allowed;
+  border-color: #18141a;
+}
+
+.stats {
+  margin-top: 20px;
+  font-size: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  background: #18141a;
+  padding: 10px;
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid #23232b;
+}
+
+.status-display {
+  margin-top: 15px;
+  padding: 10px;
+  background: #18141a;
+  color: #e0e0e0;
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid #23232b;
+  font-size: 14px;
+}
+
+.status-display h3 {
+  margin: 0 0 10px 0;
+  text-align: center;
+  color: #bfcfff;
+  text-shadow: none;
+  font-family: "Press Start 2P", "Courier New", Courier, monospace;
+}
+
+.status-display.hidden {
+  display: none;
+}
+
+#plantStatus {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+}
+
+.resource-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 0 0;
+  background: #23232b;
+  width: 100%;
+}
+
+.resource.condensed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.resource-label {
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+  text-align: right;
+  font-size: 0.62em;
+  color: #bfcfff;
+  font-family: "Press Start 2P", monospace;
+  margin-right: 4px;
+  letter-spacing: 0.5px;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.bar {
+  flex: 1 1 0;
+  height: 16px;
+  background: #18141a;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 8px #a8002c55, 0 1px 2px #000a;
+  border: 2px solid #2a0a12;
+  margin: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.level {
+  height: 100%;
+  background: #e0e0e0;
+  border-radius: 8px 0 0 8px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: none;
+}
+
+.resource:nth-child(1) .level {
+  background: #3fa7ff;
+} /* Water - bright blue */
+.resource:nth-child(2) .level {
+  background: #ffe600;
+} /* Light - bright yellow */
+.resource:nth-child(3) .level {
+  background: #a259ff;
+} /* Nutes - bright purple */
+.resource:nth-child(4) .level {
+  background-color: var(--stress-color, #ff1744);
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Growth Progress condensed style */
+.growth-progress-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+.growth-progress-label {
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+  text-align: right;
+  font-size: 0.62em;
+  color: #bfcfff;
+  font-family: "Press Start 2P", monospace;
+  margin-right: 4px;
+  letter-spacing: 0.5px;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+.growth-progress-section .bar {
+  flex: 1 1 0;
+  height: 16px;
+  margin: 0;
+  min-width: 0;
+}
+.growth-progress-section .level {
+  background: #4ade80;
+  /* Tailwind's green-400, vibrant and readable */
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+label,
+.progress-label,
+.seed-name,
+.soil-name {
+  color: #e0e0e0;
+  font-family: "Press Start 2P", "Courier New", Courier, monospace;
+}
+
+@media (max-width: 900px) {
+  body {
+    padding: 3px;
+  }
+  .selection-grid {
+    flex-direction: column;
+    gap: 4px;
+    max-height: calc(98vh - 100px);
+  }
+  .selection-column {
+    width: 100%;
+    max-width: 280px;
+    padding: 3px 1px 3px 1px;
+  }
+  .seed-options,
+  .soil-options,
+  .defense-options {
+    max-height: calc(98vh - 160px);
+  }
+}
+
+@media (max-width: 700px) {
+  body {
+    padding: 2px;
+  }
+  .selection-screen {
+    padding: 4px;
+    max-height: 99vh;
+  }
+  .selection-column {
+    width: 100%;
+    max-width: 220px;
+    padding: 2px 1px 2px 1px;
+  }
+  .selection-column h2,
+  .section-title {
+    font-size: 0.9em;
+    margin-bottom: 6px;
+  }
+  .seed-name,
+  .soil-name,
+  .defense-name {
+    font-size: 0.3em;
+  }
+  .seed-options,
+  .soil-options,
+  .defense-options {
+    max-height: calc(99vh - 140px);
+    gap: 2px;
+  }
+  .start-button {
+    padding: 4px 8px;
+    font-size: 0.7em;
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 500px) {
+  body {
+    padding: 1px;
+  }
+  .selection-screen {
+    padding: 3px;
+    max-height: 99.5vh;
+  }
+  .selection-column {
+    width: 100%;
+    max-width: 180px;
+    padding: 1px 1px 1px 1px;
+  }
+  .selection-column h2,
+  .section-title {
+    font-size: 0.8em;
+    margin-bottom: 4px;
+  }
+  .seed-name,
+  .soil-name,
+  .defense-name {
+    font-size: 0.25em;
+  }
+  .seed-options,
+  .soil-options,
+  .defense-options {
+    max-height: calc(99.5vh - 120px);
+    gap: 1px;
+  }
+  .start-button {
+    padding: 3px 6px;
+    font-size: 0.6em;
+    margin-top: 3px;
+  }
+}
+
+@media (max-height: 600px) {
+  .selection-screen {
+    padding: 3px;
+    max-height: 99vh;
+  }
+  .selection-column h2,
+  .section-title {
+    font-size: 0.8em;
+    margin-bottom: 4px;
+  }
+  .seed-name,
+  .soil-name,
+  .defense-name {
+    font-size: 0.25em;
+  }
+  .seed-options,
+  .soil-options,
+  .defense-options {
+    max-height: calc(99vh - 100px);
+    gap: 2px;
+  }
+  .start-button {
+    padding: 3px 6px;
+    font-size: 0.6em;
+    margin-top: 3px;
+  }
+}
+
+@media (max-height: 500px) {
+  .selection-screen {
+    padding: 2px;
+    max-height: 99.5vh;
+  }
+  .selection-column h2,
+  .section-title {
+    font-size: 0.7em;
+    margin-bottom: 2px;
+  }
+  .seed-name,
+  .soil-name,
+  .defense-name {
+    font-size: 0.2em;
+  }
+  .seed-options,
+  .soil-options,
+  .defense-options {
+    max-height: calc(99.5vh - 80px);
+    gap: 1px;
+  }
+  .start-button {
+    padding: 2px 4px;
+    font-size: 0.5em;
+    margin-top: 2px;
+  }
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100vw;
+  min-height: 100vh;
+  height: auto;
+}
+
+.main-title {
+  font-family: "Press Start 2P", "Courier New", Courier, monospace;
+  font-size: 2.2em;
+  color: #fff;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 32px;
+  letter-spacing: 2px;
+  font-weight: normal;
+  position: static;
+  left: auto;
+  right: auto;
+  z-index: 10;
+  text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000,
+    2px 2px 0 #000, 0 0 8px #fff, 0 0 16px #fff;
+  padding-top: 12px;
+}
+
+header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 32px;
+}
+
+.section-title {
+  color: #ffd700;
+  font-family: "Press Start 2P", monospace;
+  font-size: 1em;
+  margin-bottom: 8px;
+  margin-top: 0;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px #000a;
+  text-align: center;
+  display: block;
+  width: 100%;
+}
+
+/* Harvest Window Styles */
+.harvest-window {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.9);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 2px solid #4a4a4a;
+  color: #fff;
+  text-align: center;
+  z-index: 1000;
+  min-width: 300px;
+}
+
+.harvest-content h2 {
+  color: #ff6b6b;
+  margin-bottom: 1rem;
+}
+
+.harvest-timer {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #ffd700;
+}
+
+.harvest-stats {
+  margin-bottom: 1.5rem;
+}
+
+.harvest-stats div {
+  margin: 0.5rem 0;
+  font-size: 0.8rem;
+}
+
+.harvest-button {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.harvest-button:hover {
+  background: #ff5252;
+}
+
+/* Harvest Results Styles */
+.harvest-results {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  height: 420px;
+  min-width: 800px;
+  max-width: 800px;
+  min-height: 420px;
+  max-height: 420px;
+  background: rgba(0, 0, 0, 0.95);
+  padding: 0;
+  border-radius: 10px;
+  border: 2px solid #4a4a4a;
+  color: #fff;
+  text-align: left;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.results-content.two-column {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  gap: 0;
+}
+.results-image-col {
+  flex: 0 0 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  height: 100%;
+  padding: 0 0 0 32px;
+  box-sizing: border-box;
+}
+.final-plant-image {
+  max-width: 200px;
+  max-height: 340px;
+  width: 200px;
+  height: 340px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+  display: block;
+  background: #18141a;
+}
+.results-info-col {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* center content horizontally */
+  justify-content: flex-start;
+  min-width: 0;
+  padding: 32px 32px 32px 24px;
+  box-sizing: border-box;
+  height: 100%;
+  text-align: center; /* center text inside */
+}
+.results-info-col h2 {
+  font-size: 1.1em !important;
+  margin-bottom: 10px;
+  color: #ffd700;
+}
+.final-stats {
+  margin-bottom: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* center stat lines */
+  text-align: center; /* center text inside */
+}
+.stat-item {
+  font-size: 0.95em;
+  margin: 2px 0; /* was 4px 0, now half the gap */
+  text-align: center;
+}
+.stat-label {
+  color: #ffd700;
+  margin-right: 0.5em;
+  font-size: 0.95em;
+}
+.harvest-buttons-row {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0;
+  width: 100%;
+}
+.harvest-btn {
+  background: #23232b;
+  color: #fff;
+  border: 2px solid #bfcfff;
+  border-radius: 6px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.85em;
+  padding: 10px 18px;
+  min-width: 120px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.harvest-btn:disabled {
+  background: #23232b;
+  color: #bdbdbd;
+  border-color: #18141a;
+  cursor: not-allowed;
+}
+.harvest-btn:not(:disabled):hover {
+  background: #bfcfff;
+  color: #23232b;
+  border-color: #ffd700;
+}
+
+.results-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.harvest-stats,
+.harvest-stats-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 1.5rem 0;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.stat-item {
+  margin: 0.8rem 0;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.stat-label {
+  color: #ffd700;
+  margin-right: 0.5rem;
+}
+
+.final-plant-image {
+  max-width: 200px;
+  margin: 0 0 0 0;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.new-game-button {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+  display: block;
+  margin: 0 auto;
+}
+
+.new-game-button:hover {
+  background: #45a049;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.game-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  max-width: 1200px;
+  min-height: 0;
+  margin: 0 auto;
+  gap: 0 !important;
+}
+
+.plant-hud {
+  position: relative;
+  height: 700px;
+  min-height: 700px;
+  max-height: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 320px;
+  min-width: 220px;
+  padding: 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: #23232b;
+  border-radius: 8px 0 0 8px;
+  margin-right: 0 !important;
+}
+
+.plant-image-section {
+  width: 100%;
+  flex-grow: 1;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.plant-image-section img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 1px 9px #000a, 0 0 0 3px #23232b;
+  background: #223;
+  border: 1.5px solid #bfcfff;
+  display: block;
+}
+
+.plant-info {
+  width: 100%;
+  text-align: center;
+  margin-top: 24px;
+}
+
+.plant-stage-label,
+.plant-health-label {
+  font-size: 1.5em;
+  color: #bfcfff;
+  margin: 28px 0 0 0;
+  font-family: "Press Start 2P", "Courier New", Courier, monospace;
+  letter-spacing: 2px;
+}
+
+.main-game-area {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  min-width: 0;
+  height: auto;
+  background: #23232b;
+  color: #e0e0e0;
+  border-radius: 8px;
+  margin-right: 0 !important;
+  gap: 0 !important;
+  width: 1140px !important;
+  min-width: 1140px !important;
+  max-width: 1140px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  background: #23232b;
+  border-radius: 8px;
+  display: block !important;
+  white-space: nowrap !important; /* Prevent wrapping */
+}
+
+@media (max-width: 900px) {
+  .game-layout {
+    flex-direction: column;
+    height: auto;
+  }
+  .plant-hud {
+    flex-direction: row;
+    width: 100%;
+    min-width: 0;
+    border-right: none;
+    border-bottom: 3px solid #18141a;
+    padding: 16px 0 16px 0;
+    justify-content: center;
+    height: auto;
+  }
+  .main-game-area {
+    min-height: 0;
+    height: auto;
+  }
+}
+
+.game-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.game-controls > div {
+  display: flex;
+  gap: 18px;
+}
+
+.feeding-schedule-config {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #18141a;
+  border: 2px solid #bfcfff;
+  padding: 24px;
+  border-radius: 8px;
+  z-index: 1000;
+  color: #e0e0e0;
+  font-family: "Press Start 2P", "Courier New", Courier, monospace;
+  max-width: 90%;
+  width: 500px;
+}
+
+.feeding-schedule-config h2 {
+  color: #ffd700;
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 1.2em;
+}
+
+.schedule-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #23232b;
+  border-radius: 4px;
+}
+
+.schedule-section h3 {
+  color: #bfcfff;
+  margin-bottom: 16px;
+  font-size: 1em;
+}
+
+.schedule-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.schedule-controls label {
+  color: #e0e0e0;
+  font-size: 0.8em;
+}
+
+.schedule-controls input[type="number"],
+.schedule-controls select {
+  background: #18141a;
+  border: 1px solid #bfcfff;
+  color: #e0e0e0;
+  padding: 8px;
+  font-family: "Press Start 2P", "Courier New", Courier, monospace;
+  font-size: 0.8em;
+}
+
+.schedule-controls input[type="number"] {
+  width: 80px;
+}
+
+.schedule-controls select {
+  width: 100%;
+}
+
+#saveScheduleBtn,
+#randomFeedsBtn,
+.feeding-buttons-row button {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.schedule-info {
+  background: #23232b;
+  padding: 16px;
+  border-radius: 4px;
+  margin-top: 16px;
+}
+
+.schedule-info h3 {
+  color: #bfcfff;
+  margin-bottom: 12px;
+  font-size: 1em;
+}
+
+.schedule-info p {
+  color: #e0e0e0;
+  font-size: 0.8em;
+  margin: 8px 0;
+}
+
+/* Fixed size for Events window with restored background and border */
+.notification-section {
+  height: 220px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 12px;
+  background: black !important;
+  border: 1px solid #4a4a4a;
+  border-radius: 8px;
+  color: #bfcfff;
+  font-family: "Press Start 2P", Courier, monospace;
+  font-size: 1em;
+  margin: 0 24px;
+  display: flex;
+  flex-direction: column;
+  margin-top: auto;
+}
+
+.notification-section h3 {
+  color: #ffd700;
+  margin: 0 0 8px 0;
+  font-size: 1em;
+  text-align: center;
+}
+
+.event-log {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.75em;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-right: 0px;
+}
+
+.event-item {
+  padding: 6px 8px;
+  border-radius: 4px !important;
+  font-size: 0.85em;
+  line-height: 1.4;
+  white-space: normal !important;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.event-item.info {
+  background: rgba(0, 100, 255, 0.2);
+  border-left: 3px solid #0064ff;
+}
+
+.event-item.warning {
+  background: rgba(255, 165, 0, 0.2);
+  border-left: 3px solid #ffa500;
+}
+
+.event-item.error {
+  background: rgba(255, 0, 0, 0.2);
+  border-left: 3px solid #ff0000;
+}
+
+.event-item.actofgod {
+  background: linear-gradient(90deg, #ff00cc 0%, #ffea00 100%);
+  color: #18141a;
+  border-left: 5px solid #ff1744;
+  font-weight: bold;
+  text-shadow: 0 1px 2px #fff, 0 0 8px #ffea00;
+  box-shadow: 0 0 16px 4px #ffea00, 0 0 8px #ff00cc;
+  font-size: 1em;
+}
+
+.event-item.actofgod::before,
+.event-item.actofgod::after {
+  display: none !important;
+  background: none !important;
+  content: none !important;
+}
+
+/* Remove old popup styles */
+.pest-popup,
+.raider-popup,
+.nutrient-popup {
+  display: none;
+}
+
+.feeding-schedule-config-fullpage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #18141a;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 48px;
+}
+
+.stage-schedule-block {
+  background: #23232b;
+  border-radius: 10px;
+  padding: 32px 48px;
+  margin-bottom: 32px;
+  box-shadow: 0 0 0 2px #18141a, 0 0 0 8px #000;
+  border: 2px solid #18141a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 420px;
+}
+
+.stage-label {
+  color: #e0e0e0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.3em;
+  margin-bottom: 18px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.water-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 18px;
+}
+
+.water-circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 8px;
+  background: #18141a;
+  color: #e0e0e0;
+  font-size: 2.8em;
+  font-family: "Press Start 2P", monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid #e0e0e0;
+  box-shadow: none;
+}
+
+.big-btn {
+  width: 64px;
+  height: 64px;
+  font-size: 2.5em;
+  font-family: "Arial Black", "Arial", sans-serif;
+  font-weight: bold;
+  background: #23232b;
+  color: #e0e0e0;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+}
+
+.big-btn:hover,
+.big-btn:active {
+  background: #18141a;
+  color: #e0e0e0;
+  border-color: #fff;
+}
+
+.nutrient-row {
+  display: flex;
+  gap: 18px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.nutrient-btn {
+  font-size: 1.1em;
+  font-family: "Press Start 2P", monospace;
+  background: #23232b;
+  color: #e0e0e0;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 18px 28px;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  box-shadow: none;
+}
+
+.nutrient-btn.selected,
+.nutrient-btn:hover,
+.nutrient-btn:active {
+  background: #18141a;
+  color: #e0e0e0;
+  border-color: #fff;
+}
+
+.save-btn {
+  margin-top: 32px;
+  font-size: 1.5em;
+  font-family: "Press Start 2P", monospace;
+  background: #23232b;
+  color: #e0e0e0;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 18px 48px;
+  cursor: pointer;
+  box-shadow: none;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.save-btn:hover,
+.save-btn:active {
+  background: #18141a;
+  color: #e0e0e0;
+  border-color: #fff;
+}
+
+#gameContainer {
+  background: #23232b;
+  color: #e0e0e0;
+  border-radius: 10px;
+  box-shadow: 0 0 20px #18141a;
+  padding: 20px;
+}
+
+.plant-hud,
+.main-game-area,
+#gameContainer,
+.notification-section,
+.harvest-window,
+.harvest-results,
+.final-plant-image,
+.stage-schedule-block {
+  border-radius: 10px !important;
+}
+
+.bar,
+.progress-bar,
+.level,
+.progress-fill,
+.resource-bars,
+.status-display,
+.stats,
+.schedule-info,
+.save-btn,
+.nutrient-btn,
+.big-btn,
+.water-circle {
+  border-radius: 0 !important;
+}
+
+input,
+button,
+.local-hud,
+.event-log,
+.event-item {
+  border-radius: 0 !important;
+}
+
+.nutrient-wheel {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  margin: 24px auto 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nutrient-btn.wheel-btn {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: -10px 0px;
+  width: 90px;
+  height: 36px;
+  font-size: 0.95em;
+  font-family: "Press Start 2P", monospace;
+  background: #23232b;
+  color: #e0e0e0;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  box-shadow: none;
+  text-align: center;
+  padding: 0 8px;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.nutrient-btn.wheel-btn.selected,
+.nutrient-btn.wheel-btn:hover,
+.nutrient-btn.wheel-btn:active {
+  background: #18141a;
+  color: #e0e0e0;
+  border-color: #fff;
+  z-index: 2;
+}
+
+.nutrient-scroll-wheel {
+  width: 240px !important;
+  min-width: 220px;
+  max-width: 320px;
+  padding: 10px 0 10px 0;
+}
+
+.nutrient-scroll-btn {
+  width: 140px;
+  margin: 0 auto 2px auto;
+  font-size: 0.85em;
+  background: #23232b;
+  color: #e0e0e0;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  box-shadow: none;
+  text-align: center;
+  padding: 2px 8px;
+  opacity: 0.6;
+  z-index: 1;
+  white-space: nowrap;
+  outline: none;
+}
+
+.nutrient-scroll-btn.selected {
+  background: #18141a;
+  color: #e0e0e0;
+  border-color: #fff;
+  font-size: 1em;
+  opacity: 1;
+  z-index: 2;
+}
+
+.scroll-arrow {
+  width: 100%;
+  min-width: 200px;
+  max-width: 300px;
+  height: 32px;
+  font-size: 1.5em;
+  background: none;
+  border: none;
+  color: #bfcfff;
+  border-radius: 8px;
+  margin: 2px 0;
+  cursor: pointer;
+  text-align: center;
+  transition: color 0.2s, background 0.2s;
+}
+
+.scroll-arrow:hover,
+.scroll-arrow:active {
+  color: #ffd700;
+  background: #23232b;
+}
+
+.name-input-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(24, 16, 32, 1);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.name-input-bg {
+  position: relative;
+  width: 816px;
+  height: 653px;
+  margin: 0 auto;
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px #000b, 0 0 0 2px #bfcfff;
+  background: #23232b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.intro-bg-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  opacity: 0.82;
+  pointer-events: none;
+}
+.name-input-content {
+  position: relative;
+  z-index: 2;
+  background: rgba(24, 20, 26, 0.82);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 2px 12px #000a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 45%;
+  min-width: 320px;
+  margin: 0 auto;
+  gap: 12px;
+}
+.name-input-content h2 {
+  font-size: 1.1em;
+  margin-bottom: 20px;
+  color: #bfcfff;
+  font-family: "Press Start 2P", monospace;
+  text-align: center;
+}
+#growerNameInput {
+  font-size: 0.95em;
+  padding: 0.5rem 0.7rem;
+  margin-bottom: 0;
+  border-radius: 6px;
+  border: 2px solid #bfcfff;
+  width: 100%;
+  max-width: 260px;
+  font-family: "Press Start 2P", monospace;
+}
+#confirmNameBtn,
+.secondary-btn {
+  width: 100%;
+  max-width: 260px;
+  display: block;
+  margin: 0;
+  box-sizing: border-box;
+}
+#confirmNameBtn:hover {
+  background: #9ba8d9;
+}
+
+#confirmNameBtn.enabled {
+  background-color: #2ecc71;
+  color: #fff;
+  border-color: #27ae60;
+  box-shadow: 0 0 8px rgba(46, 204, 113, 0.7);
+}
+
+#confirmNameBtn.enabled:hover {
+  background-color: #27ae60;
+}
+
+@media (max-width: 700px) {
+  .name-input-bg {
+    width: 98vw;
+    height: 98vw;
+    min-width: 220px;
+    min-height: 220px;
+    max-width: 98vw;
+    max-height: 98vw;
+    border-radius: 18px;
+  }
+  .name-input-content {
+    width: 90%;
+    min-width: 280px;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 500px) {
+  .name-input-content {
+    width: 95%;
+    min-width: 250px;
+    padding: 16px;
+  }
+}
+
+.grower-name,
+.persistent-seed-count {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.1em;
+  color: #e0e0e0;
+  text-shadow: 0 2px 8px #000a;
+  letter-spacing: 1px;
+  margin: 0;
+  padding: 0;
+}
+
+.persistent-seed-count {
+  color: #ffd700;
+}
+
+.high-scores {
+  background: #2a1f2e;
+  padding: 1rem;
+  border-radius: 10px;
+  margin: 1rem auto;
+  max-width: 800px;
+  border: 2px solid #bfcfff;
+}
+
+.high-scores h3 {
+  color: #bfcfff;
+  font-family: "Press Start 2P", monospace;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.high-scores-hud {
+  position: relative;
+  height: 700px;
+  min-height: 700px;
+  max-height: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 400px;
+  min-width: 220px;
+  padding: 12px;
+  box-sizing: border-box;
+  margin-left: 0 !important;
+}
+
+.high-scores-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.high-scores-content h3 {
+  color: #bfcfff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.3em;
+  margin-bottom: 10px;
+  margin-top: 0;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.scores-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  overflow: hidden;
+  padding: 0;
+}
+
+.score-section {
+  background: #18141a;
+  padding: 12px 10px;
+  border-radius: 8px;
+  border: 2px solid #23232b;
+  margin: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  max-height: 150px;
+}
+
+.score-section:last-child {
+  border-radius: 8px;
+}
+
+.score-section h4 {
+  color: #bfcfff;
+  font-family: "Press Start 2P", monospace;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+#potencyScores,
+#yieldScores,
+#averagePotencyScores,
+#totalPersonalYield {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 80px;
+  min-height: 80px;
+  max-height: 80px;
+  overflow-y: scroll;
+  padding-right: 4px;
+}
+
+#potencyScores::-webkit-scrollbar,
+#yieldScores::-webkit-scrollbar,
+#averagePotencyScores::-webkit-scrollbar,
+#totalPersonalYield::-webkit-scrollbar {
+  width: 8px;
+}
+
+#potencyScores::-webkit-scrollbar-track,
+#yieldScores::-webkit-scrollbar-track,
+#averagePotencyScores::-webkit-scrollbar-track,
+#totalPersonalYield::-webkit-scrollbar-track {
+  background: #23232b;
+}
+
+#potencyScores::-webkit-scrollbar-thumb,
+#yieldScores::-webkit-scrollbar-thumb,
+#averagePotencyScores::-webkit-scrollbar-thumb,
+#totalPersonalYield::-webkit-scrollbar-thumb {
+  background: #bfcfff;
+  border-radius: 2px;
+}
+
+.score-entry {
+  background: #23232b;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-family: "Press Start 2P", monospace;
+  color: #e0e0e0;
+  text-align: center;
+  margin: 0;
+  flex-shrink: 0;
+  min-height: 20px;
+  line-height: 1.2;
+  /* Truncate usernames longer than 9 characters */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Limit username display to 9 characters to prevent pushing potency scores */
+.score-entry span[style*="color:#fff"] {
+  display: inline-block;
+  max-width: 9ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Target username content in score entries (text before the colon) */
+.score-entry {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+.score-entry .username {
+  max-width: 9ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1200px) {
+  .main-game-area {
+    flex-direction: column;
+  }
+  .plant-hud,
+  .high-scores-hud {
+    width: 100%;
+    min-width: 0;
+    border-right: none;
+    border-left: none;
+    border-bottom: 3px solid #18141a;
+    padding: 16px 0;
+    height: auto;
+  }
+  .high-scores-hud {
+    border-radius: 0;
+  }
+  .scores-container {
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+  }
+  .score-section {
+    flex: 1;
+    max-width: 300px;
+  }
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.main-title {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.grower-name {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  color: #bfcfff;
+  font-family: "Press Start 2P", monospace;
+}
+
+/* 1. Water number display as square, not circle */
+.water-display {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  background: #23232b;
+  color: #7fbbff;
+  font-size: 2.2em;
+  font-family: "Arial Black", Arial, sans-serif;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #4a4a55;
+  box-shadow: 0 0 8px rgba(127, 187, 255, 0.12);
+  margin: 0 8px;
+}
+
+/* 2. Plus/minus buttons: big, bold, modern */
+.water-btn {
+  width: 48px;
+  height: 60px;
+  border-radius: 10px;
+  background: #2a2a35;
+  color: #e0e0e0;
+  font-size: 2.5em;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  border: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+.water-btn:active,
+.water-btn:hover {
+  background: #44445a;
+  color: #fff;
+}
+
+/* 3. Make nutrient scroll selectors wider */
+.nutrient-scroll-wheel {
+  width: 240px !important;
+  min-width: 220px;
+  max-width: 320px;
+  padding: 10px 0 10px 0;
+}
+.nutrient-option {
+  width: 95%;
+  min-width: 200px;
+  max-width: 300px;
+  margin: 4px 0;
+  padding: 10px 12px;
+  background: rgba(42, 42, 53, 0.9);
+  border: 2px solid rgba(224, 224, 224, 0.2);
+  border-radius: 8px;
+  color: #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.nutrient-option.selected,
+.nutrient-option:active,
+.nutrient-option:hover {
+  background: #23232b;
+  border-color: #ffd700;
+}
+
+/* 4. Mix title font smaller, one line; subtext two lines */
+.nutrient-option .mix-title {
+  font-size: 0.8em;
+  font-family: "Press Start 2P", monospace;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+  width: 100%;
+}
+.nutrient-option .mix-desc {
+  font-size: 0.65em;
+  color: #bfcfff;
+  opacity: 0.8;
+  line-height: 1.2;
+  max-height: 2.4em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+}
+
+/* 5. Scroll arrows match new width */
+.scroll-arrow {
+  width: 100%;
+  min-width: 200px;
+  max-width: 300px;
+  height: 32px;
+  font-size: 1.5em;
+  background: none;
+  border: none;
+  color: #bfcfff;
+  border-radius: 8px;
+  margin: 2px 0;
+  cursor: pointer;
+  text-align: center;
+  transition: color 0.2s, background 0.2s;
+}
+.scroll-arrow:hover,
+.scroll-arrow:active {
+  color: #ffd700;
+  background: #23232b;
+}
+
+/* Feeding schedule bottom button row alignment fix */
+.feeding-buttons-row {
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Ensures vertical alignment */
+  gap: 32px;
+  margin-top: 36px;
+}
+.feeding-buttons-row button {
+  height: 56px;
+  min-width: 180px;
+  font-size: 1.1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 15px;
+  box-sizing: border-box;
+}
+
+/* --- Seed & Soil Selection Modernization --- */
+.selection-screen {
+  background: #23232b;
+  border-radius: 18px;
+  box-shadow: 0 6px 32px #000a, 0 0 0 2px #18141a;
+  color: #e0e0e0;
+  text-align: center;
+  max-width: none;
+  width: auto;
+  margin: 0 auto;
+  padding: 8px 8px 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: 95vh;
+  overflow: hidden;
+}
+.selection-grid {
+  display: inline-flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: flex-start;
+  width: auto;
+  margin-bottom: 6px;
+  flex: 1;
+  min-height: 0;
+  max-height: calc(98vh - 120px);
+}
+.selection-column {
+  background: rgba(35, 35, 43, 0.6);
+  border-radius: 12px;
+  padding: 4px 1px 4px 1px;
+  width: 160px;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 12px #000a;
+  border: 2px solid rgba(224, 224, 224, 0.08);
+  max-height: 100%;
+  overflow: hidden;
+}
+.section-title {
+  color: #ffd700;
+  font-family: "Press Start 2P", monospace;
+  font-size: 1em;
+  margin-bottom: 8px;
+  margin-top: 0;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px #000a;
+  text-align: center;
+  display: block;
+  width: 100%;
+}
+/* Remove flexbox-based .seed-options, .soil-options rule to prevent override */
+/* .seed-options, .soil-options {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+  } */
+.seed-option,
+.soil-option,
+.defense-option {
+  background: none;
+  border-radius: 10px;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  border: none;
+  min-width: 0;
+  cursor: pointer;
+  transition: filter 0.2s ease, border-color 0.2s ease;
+  display: flex !important;
+  align-items: stretch;
+  justify-content: stretch;
+  position: relative;
+  overflow: hidden;
+}
+.seed-option.selected,
+.soil-option.selected,
+.defense-option.selected {
+  filter: none;
+  border: 2px solid #ffd700;
+  background: #23232b;
+}
+.seed-option:not(.selected),
+.soil-option:not(.selected),
+.defense-option:not(.selected) {
+  filter: grayscale(100%) brightness(0.3);
+  border: 2px solid transparent;
+}
+.seed-option:hover:not(.selected),
+.soil-option:hover:not(.selected),
+.defense-option:hover:not(.selected) {
+  filter: grayscale(50%) brightness(0.6);
+  border: 2px solid #bfcfff;
+}
+.seed-option:hover.selected,
+.soil-option:hover.selected,
+.defense-option:hover.selected {
+  filter: none;
+  border: 2px solid #ffd700;
+}
+.seed-option.selected .seed-img,
+.soil-option.selected .soil-img,
+.defense-option.selected .defense-img {
+  /* Remove old border and box-shadow styles - now handled by container */
+}
+.seed-option:hover .seed-img,
+.soil-option:hover .soil-img,
+.defense-option:hover .defense-img {
+  /* Remove old border and box-shadow styles - now handled by container */
+}
+.seed-name,
+.soil-name,
+.defense-name {
+  background: rgba(24, 20, 26, 0.35);
+  color: #fff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.35em;
+  font-weight: bold;
+  text-align: center;
+  padding: 1px 0 1px 0;
+  border-radius: 0 0 6px 6px;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  letter-spacing: 0.5px;
+}
+@media (max-width: 900px) {
+  .selection-grid {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .selection-column {
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+#resetHighScoresBtn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  font-size: 0.7em;
+  background: #c0392b;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#resetHighScoresBtn:hover {
+  background: #e74c3c;
+}
+.event-log {
+  border-top: 2px solid #333;
+}
+#seedSoilDisplay {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.seed-soil-square {
+  width: 60px;
+  height: 60px;
+  border: 2px solid #bfcfff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(35, 35, 43, 0.6);
+  overflow: hidden;
+}
+.seed-soil-square img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.seed-soil-square .seed-name,
+.seed-soil-square .soil-name,
+.seed-soil-square .defense-name {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  background: rgba(24, 20, 26, 0.35);
+  color: #fff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.45em;
+  font-weight: normal;
+  text-align: center;
+  padding: 1px 0 1px 0;
+  border-radius: 0 0 8px 8px;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 2;
+  letter-spacing: 0.5px;
+}
+
+.seed-bank-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  min-height: 56px;
+}
+.seed-bank-display img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #bfcfff;
+  box-shadow: 0 2px 8px #000a;
+  margin-bottom: 4px;
+}
+.seed-bank-display div {
+  font-family: "Press Start 2P", monospace;
+  color: #ffd700;
+  font-size: 1em;
+  text-align: center;
+}
+
+.defense-options {
+  display: grid !important;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  justify-items: stretch;
+  align-items: stretch;
+}
+
+.defense-option {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  background: none;
+  border-radius: 10px;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  border: none;
+  cursor: pointer;
+  transition: filter 0.2s ease, border-color 0.2s ease;
+  display: flex !important;
+  align-items: stretch;
+  justify-content: stretch;
+  overflow: hidden;
+}
+
+.defense-option.selected {
+  filter: none;
+  border: 2px solid #ffd700;
+  background: #23232b;
+}
+
+.defense-option:not(.selected) {
+  filter: grayscale(100%) brightness(0.3);
+  border: 2px solid transparent;
+}
+
+.defense-option:hover:not(.selected) {
+  filter: grayscale(50%) brightness(0.6);
+  border: 2px solid #bfcfff;
+}
+
+.defense-option:hover.selected {
+  filter: none;
+  border: 2px solid #ffd700;
+}
+
+.defense-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border: none;
+  margin: 0;
+  box-shadow: none;
+  border-radius: 0;
+  background: none;
+  position: static;
+}
+
+.defense-name {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  text-align: center;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.4em;
+  color: #fff;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  z-index: 2;
+  background: rgba(24, 20, 26, 0.35);
+  padding: 1px 0 1px 0;
+  border-radius: 0 0 6px 6px;
+  pointer-events: none;
+  margin-bottom: 0;
+}
+
+.defense-desc {
+  display: none;
+}
+
+.name-input-content input {
+  width: 100%;
+  padding: 10px;
+  margin: 0;
+  border: 2px solid #bfcfff;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #bfcfff;
+  font-family: "Press Start 2P", monospace;
+}
+
+.name-input-content input[type="password"] {
+  letter-spacing: 4px;
+}
+
+.secondary-btn {
+  background: transparent;
+  border: 2px solid #bfcfff;
+  color: #bfcfff;
+  padding: 8px 16px;
+  margin-top: 0;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Press Start 2P", monospace;
+  transition: all 0.2s;
+  font-size: 0.8em;
+}
+
+.secondary-btn:hover {
+  background: #bfcfff;
+  color: #23141c;
+}
+
+#seedLockoutMsg {
+  font-size: 0.7em !important;
+  margin: 12px 0 0 0 !important;
+}
+
+#showSeedUnlocksBtn {
+  font-size: 0.7em !important;
+  padding: 10px 22px !important;
+  font-family: "Press Start 2P", monospace;
+  border-radius: 8px;
+  background: #bfcfff;
+  color: #23141c;
+  border: none;
+  cursor: pointer;
+  width: 250px;
+  margin: 0;
+  white-space: nowrap;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#harvestImageFlex {
+  margin: 0 !important;
+}
+
+/* Make Harvest Complete! heading smaller */
+#harvestResults h2 {
+  font-size: 1.2em !important;
+}
+/* Make stat labels smaller */
+#harvestResults .stat-label {
+  font-size: 0.9em !important;
+}
+/* Make stat values smaller */
+#harvestResults .stat-item span:not(.stat-label) {
+  font-size: 0.9em !important;
+}
+
+#harvestResults .stat-item,
+#harvestResults .stat-label,
+#harvestResults .stat-item span:not(.stat-label) {
+  font-size: 1.1em !important;
+}
+
+.grower-seeds-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+.grower-name,
+.persistent-seed-count {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.1em;
+  color: #e0e0e0;
+  text-shadow: 0 2px 8px #000a;
+  letter-spacing: 1px;
+  margin: 0;
+  padding: 0;
+}
+.persistent-seed-count {
+  color: #ffd700;
+}
+
+#seedUnlocksModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(35, 20, 28, 0.95);
+  z-index: 4000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#seedUnlocksModal .modal-content {
+  background: #23232b;
+  border-radius: 18px;
+  padding: 24px 32px;
+  box-shadow: 0 6px 32px #000a, 0 0 0 2px #18141a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 340px;
+  max-width: 90vw;
+}
+
+#seedUnlocksModal h2 {
+  color: #ffd700;
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.1em;
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+#seedUnlocksGrid {
+  margin-bottom: 18px;
+}
+
+#seedUnlocksGrid img {
+  transition: all 0.2s ease;
+}
+
+#seedUnlocksGrid img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.threshold-legend {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6em;
+  color: #bfcfff;
+  text-align: left;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.threshold-text {
+  color: #ffd700;
+  margin: 2px 0;
+}
+
+#closeSeedUnlocksBtn {
+  font-size: 0.9em;
+  padding: 8px 24px;
+  background: #bfcfff;
+  color: #23141c;
+  border: none;
+  border-radius: 8px;
+  font-family: "Press Start 2P", monospace;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#closeSeedUnlocksBtn:hover {
+  background: #ffd700;
+  transform: scale(1.05);
+}
+
+.unlock-button {
+  width: 100px;
+  height: 100px;
+  background: #18141a;
+  border: 2px solid #333;
+  padding: 8px;
+  margin: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: "Press Start 2P", monospace;
+  cursor: pointer;
+  position: relative;
+}
+
+.unlock-button.unlocked {
+  background: #23232b;
+  border-color: #bfcfff;
+}
+
+.unlock-button img {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+}
+
+.unlock-button-text {
+  font-size: 0.45em;
+  color: #bfcfff;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+}
+
+.unlock-requirement {
+  font-size: 0.45em;
+  color: #666;
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+}
+
+.unlock-button.next-unlock .unlock-requirement {
+  color: #ffd700;
+}
+
+.bottom-buttons-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 auto;
+  width: fit-content;
+}
+
+.start-button {
+  width: 250px !important;
+  margin: 0 !important;
+  font-size: 0.7em !important;
+  white-space: nowrap;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+}
+
+.login-form-container input,
+.login-form-container select,
+.login-form-container button {
+  width: 260px;
+  box-sizing: border-box;
+}
+
+.secondary-buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 260px;
+}
+
+#loginLogo {
+  display: block;
+  margin: 0 auto;
+  width: 50%;
+  max-width: 125px;
+}
+
+#mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  font-family: "Press Start 2P", monospace;
+  /* Prevent user selection and interaction */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  /* Prevent context menu */
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  /* Force visibility */
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+#mobile-overlay.hidden {
+  display: none;
+}
+
+/* Force hide main content on mobile devices */
+@media (max-width: 768px) {
+  .main-container,
+  .game-container,
+  .selection-screen,
+  .plant-hud,
+  .high-scores-hud,
+  #gameContainer,
+  .main-game-area,
+  .game-layout {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
+  }
+
+  #mobile-overlay {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    position: fixed !important;
+    z-index: 99999 !important;
+  }
+}
+
+.mobile-overlay-message h2 {
+  font-size: 2em;
+  color: #ffd700;
+  margin-bottom: 1rem;
+}
+
+.mobile-overlay-message p {
+  font-size: 1em;
+  color: #bfcfff;
+  max-width: 80%;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+@keyframes loadingDots {
+  0% {
+    content: "";
+  }
+  25% {
+    content: ".";
+  }
+  50% {
+    content: "..";
+  }
+  75% {
+    content: "...";
+  }
+  100% {
+    content: "";
+  }
+}
+
+.loading-dots::after {
+  content: "";
+  display: inline-block;
+  animation: loadingDots 1.5s infinite;
+}
+
+@media (max-width: 700px) {
+  .seed-soil-square {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 500px) {
+  .seed-soil-square {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+@media (max-height: 600px) {
+  .seed-soil-square {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+@media (max-height: 500px) {
+  .seed-soil-square {
+    width: 25px;
+    height: 25px;
+  }
+}
+
+/* Make the main simulation section 300px shorter (400px tall) */
+.main-game-area,
+.game-container,
+#gameContainer {
+  height: 400px !important;
+  min-height: 400px !important;
+  max-height: 400px !important;
+}
+
+.game-container {
+  overflow-y: auto;
+}
+
+/* Make side panels match the 400px height of the middle section */
+.plant-hud,
+.high-scores-hud {
+  height: 400px !important;
+  min-height: 400px !important;
+  max-height: 400px !important;
+}
+
+/* Set all main columns to 600px tall (was 400px) */
+.main-game-area,
+.game-container,
+#gameContainer,
+.plant-hud,
+.high-scores-hud {
+  height: 600px !important;
+  min-height: 600px !important;
+  max-height: 600px !important;
+}
+
+/* Make side panels narrower (reduce width by ~100px) */
+.plant-hud,
+.high-scores-hud {
+  width: 260px !important;
+  min-width: 200px !important;
+  max-width: 260px !important;
+}
+
+/* Remove gap/margin from main flex containers */
+.main-game-area,
+.game-layout {
+  gap: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Ensure the middle section fills available space */
+#gameContainer,
+.game-container {
+  flex: 1 1 0 !important;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Side panels fixed width */
+.plant-hud,
+.high-scores-hud {
+  width: 260px !important;
+  min-width: 200px !important;
+  max-width: 260px !important;
+  flex: 0 0 260px !important;
+  box-sizing: border-box;
+}
+
+/* --- STATIC, NON-FLEXING LAYOUT --- */
+.main-game-area {
+  display: block !important;
+  width: 900px;
+  height: 600px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.plant-hud {
+  display: inline-block;
+  vertical-align: top;
+  width: 260px;
+  min-width: 260px;
+  max-width: 260px;
+  height: 600px;
+}
+
+#gameContainer,
+.game-container {
+  display: inline-block;
+  vertical-align: top;
+  width: 380px;
+  min-width: 380px;
+  max-width: 380px;
+  height: 600px;
+  overflow: hidden;
+}
+
+.high-scores-hud {
+  display: inline-block;
+  vertical-align: top;
+  width: 260px;
+  min-width: 260px;
+  max-width: 260px;
+  height: 600px;
+}
+
+/* Remove all flex from children */
+.plant-hud,
+.high-scores-hud,
+#gameContainer,
+.game-container {
+  flex: none !important;
+}
+
+/* --- STATIC, NON-FLEXING LAYOUT (WIDER MIDDLE) --- */
+.main-game-area {
+  display: block !important;
+  width: 1020px;
+  height: 600px;
+  margin: 0 auto;
+  position: relative;
+}
+
+#gameContainer,
+.game-container {
+  display: inline-block;
+  vertical-align: top;
+  width: 500px;
+  min-width: 500px;
+  max-width: 500px;
+  height: 600px;
+  overflow: hidden;
+}
+
+/* --- STATIC, NON-FLEXING LAYOUT (EVEN WIDER MIDDLE) --- */
+.main-game-area {
+  display: block !important;
+  width: 1140px;
+  height: 600px;
+  margin: 0 auto;
+  position: relative;
+}
+
+#gameContainer,
+.game-container {
+  display: inline-block;
+  vertical-align: top;
+  width: 620px;
+  min-width: 620px;
+  max-width: 620px;
+  height: 600px;
+  overflow: hidden;
+}
+
+/* --- STATIC, NON-FLEXING PERSONAL SCOREBOARD --- */
+.high-scores-hud {
+  display: inline-block !important;
+  vertical-align: top;
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+  height: 600px !important;
+  min-height: 600px !important;
+  max-height: 600px !important;
+  box-sizing: border-box;
+  padding: 12px;
+  margin-left: 0 !important;
+  position: relative;
+}
+
+.high-scores-content {
+  width: 100%;
+  height: 100%;
+  display: block !important;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.scores-container {
+  width: 100%;
+  display: block !important;
+  padding: 0;
+}
+
+.score-section {
+  background: #18141a;
+  padding: 12px 10px;
+  border-radius: 8px;
+  border: 2px solid #23232b;
+  margin: 0 0 12px 0;
+  width: 100%;
+  display: block !important;
+  box-sizing: border-box;
+}
+
+/* Prevent columns from wrapping in main-game-area */
+.main-game-area {
+  white-space: nowrap;
+  width: 1140px !important;
+  min-width: 1140px !important;
+  max-width: 1140px !important;
+  display: block !important;
+  margin: 0 auto;
+  position: relative;
+}
+
+.plant-hud,
+.high-scores-hud,
+#gameContainer,
+.game-container {
+  display: inline-block !important;
+  vertical-align: top !important;
+  float: none !important;
+}
+
+/* --- REMOVE FLEX FROM PLANT HUD AND IMAGE SECTION --- */
+.plant-hud {
+  display: inline-block !important;
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+  height: 600px !important;
+  min-height: 600px !important;
+  max-height: 600px !important;
+  box-sizing: border-box;
+  padding: 12px;
+  margin: 0 !important;
+  position: relative;
+  /* Remove flex properties */
+  flex: none !important;
+  flex-direction: unset !important;
+  align-items: unset !important;
+  justify-content: unset !important;
+}
+
+.plant-image-section {
+  display: block !important;
+  width: 100% !important;
+  height: 390px !important;
+  min-height: 200px !important;
+  max-height: 410px !important;
+  margin: 0 auto !important;
+  box-sizing: border-box;
+  /* Remove flex properties */
+  flex: none !important;
+  flex-direction: unset !important;
+  align-items: unset !important;
+  justify-content: unset !important;
+}
+
+.plant-image-section img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+/* --- REMOVE FLEX FROM SEED SOIL SQUARES --- */
+.seed-soil-square {
+  display: inline-block !important;
+  vertical-align: top !important;
+  width: 60px !important;
+  height: 60px !important;
+  margin: 0 8px 0 0 !important;
+  border: 2px solid #bfcfff;
+  border-radius: 8px;
+  background: rgba(35, 35, 43, 0.6);
+  overflow: hidden;
+  /* Remove flex properties */
+  align-items: unset !important;
+  justify-content: unset !important;
+  flex: none !important;
+}
+#seedSoilDisplay {
+  display: block !important;
+  text-align: center !important;
+  margin: 12px 0 0 0 !important;
+  padding: 0 !important;
+  width: 100%;
+}
+
+/* --- FIX SEED SOIL SQUARES FOR 4 ICONS --- */
+.seed-soil-square {
+  width: 48px !important;
+  height: 48px !important;
+  margin: 0 8px 0 0 !important;
+}
+.seed-soil-square:last-child {
+  margin-right: 0 !important;
+}
+#seedSoilDisplay {
+  min-width: 220px !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+}
+.seed-soil-square img {
+  width: 80% !important;
+  height: 80% !important;
+  max-width: 80% !important;
+  max-height: 80% !important;
+  display: block;
+  margin: 0 auto;
+}
+
+/* --- TIGHTER GAP FOR SEED SOIL SQUARES --- */
+.seed-soil-square {
+  width: 48px !important;
+  height: 48px !important;
+  margin: 0 2px 0 0 !important;
+}
+.seed-soil-square:last-child {
+  margin-right: 0 !important;
+}
+#seedSoilDisplay {
+  min-width: 200px !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-align: center !important;
+}
+
+/* --- REMOVE GAP AND FILL SEED SOIL SQUARES (SCOPED TO GAME UI) --- */
+#seedSoilDisplay {
+  font-size: 0 !important;
+  text-align: center !important;
+}
+#seedSoilDisplay .seed-soil-square {
+  width: 64px !important;
+  height: 64px !important;
+  margin: 0 !important;
+  display: inline-block !important;
+  vertical-align: top !important;
+}
+#seedSoilDisplay .seed-soil-square img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block;
+  margin: 0;
+}
+
+/* --- STRICT THREE-COLUMN STATIC LAYOUT FOR MAIN GAME AREA --- */
+.main-game-area {
+  display: block !important;
+  width: 1140px !important; /* 260 + 620 + 260 */
+  height: 600px !important;
+  margin: 0 auto;
+  background: #23232b;
+  border-radius: 8px;
+  position: relative;
+  white-space: normal !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+}
+
+.plant-hud,
+#gameContainer,
+.high-scores-hud {
+  display: inline-block !important;
+  vertical-align: top !important;
+  height: 600px !important;
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.plant-hud {
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+  border-radius: 8px 0 0 8px;
+}
+
+#gameContainer {
+  width: 620px !important;
+  min-width: 620px !important;
+  max-width: 620px !important;
+  border-radius: 0;
+}
+
+.high-scores-hud {
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+  border-radius: 0 8px 8px 0;
+}
+
+/* --- FORCE HIGH SCORES HUD TO BE STATIC, FIXED, AND CONTAINED --- */
+.high-scores-hud {
+  display: inline-block !important;
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+  height: 600px !important;
+  min-height: 600px !important;
+  max-height: 600px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+  float: none !important;
+  flex: none !important;
+  flex-direction: unset !important;
+  align-items: unset !important;
+  justify-content: unset !important;
+}
+.high-scores-content {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  flex: none !important;
+  flex-direction: unset !important;
+  align-items: unset !important;
+  justify-content: unset !important;
+}
+
+/* --- LOCK THREE-COLUMN LAYOUT, DISABLE RESPONSIVE BREAKPOINTS --- */
+@media (max-width: 2000px) {
+  .main-game-area,
+  .plant-hud,
+  .high-scores-hud,
+  #gameContainer {
+    width: unset !important;
+    min-width: unset !important;
+    max-width: unset !important;
+    height: unset !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    border: unset !important;
+    padding: unset !important;
+    box-sizing: border-box !important;
+  }
+}
+.main-container {
+  overflow-x: auto !important;
+}
+.main-game-area {
+  width: 1140px !important;
+  min-width: 1140px !important;
+  max-width: 1140px !important;
+  height: 600px !important;
+  min-height: 600px !important;
+  max-height: 600px !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  background: #23232b;
+  border-radius: 8px;
+  position: relative;
+}
+.plant-hud,
+#gameContainer,
+.high-scores-hud {
+  display: inline-block !important;
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+  height: 600px !important;
+  min-height: 600px !important;
+  max-height: 600px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  vertical-align: top !important;
+  box-sizing: border-box !important;
+  border-radius: 8px 0 0 8px !important;
+}
+#gameContainer {
+  width: 620px !important;
+  min-width: 620px !important;
+  max-width: 620px !important;
+  border-radius: 0 !important;
+}
+.high-scores-hud {
+  border-radius: 0 8px 8px 0 !important;
+}
+
+/* --- MAKE SCOREBOARD SECTIONS FILL PERSONAL HUD WIDTH --- */
+.high-scores-hud .score-section {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin: 0 0 6px 0 !important;
+}
+.high-scores-hud .score-section:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* --- ENSURE MIDDLE SIMULATION COLUMN IS 620PX, SIDES ARE 260PX --- */
+#gameContainer {
+  width: 620px !important;
+  min-width: 620px !important;
+  max-width: 620px !important;
+  height: 600px !important;
+  min-height: 600px !important;
+  max-height: 600px !important;
+  display: inline-block !important;
+  vertical-align: top !important;
+  box-sizing: border-box !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.plant-hud,
+.high-scores-hud {
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+  height: 600px !important;
+  min-height: 600px !important;
+  max-height: 600px !important;
+  display: inline-block !important;
+  vertical-align: top !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* --- MAIN GAME AREA HUGS THREE COLUMNS --- */
+.main-game-area {
+  width: auto !important;
+  min-width: unset !important;
+  max-width: unset !important;
+  display: block !important;
+  white-space: nowrap !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  background: #23232b;
+  border-radius: 8px;
+  position: relative;
+}
+
+/* --- STATIC HEIGHT: MAIN GAME AREA AND COLUMNS --- */
+.main-game-area {
+  height: 500px !important;
+  min-height: 500px !important;
+  max-height: 500px !important;
+}
+
+.plant-hud,
+#gameContainer,
+.high-scores-hud {
+  height: 500px !important;
+  min-height: 500px !important;
+  max-height: 500px !important;
+}
+
+/* Add a little space below the Events div (update selector if needed) */
+.events-window,
+.events-div,
+#eventsDiv,
+#eventsWindow {
+  margin-bottom: 20px !important;
+}
+
+/* --- REMOVE PADDING/BORDER FROM MAIN GAME COLUMNS FOR PERFECT FIT --- */
+.plant-hud,
+#gameContainer,
+.high-scores-hud {
+  padding: 0 !important;
+  border: none !important;
+  box-sizing: border-box !important;
+}
+
+/* --- REMOVE INLINE-BLOCK WHITESPACE GAP BETWEEN COLUMNS --- */
+.main-game-area {
+  font-size: 0 !important;
+}
+.plant-hud,
+#gameContainer,
+.high-scores-hud {
+  font-size: initial !important;
+}
+
+/* --- MAKE GAME CONTAINER AND PARENTS HUG THREE COLUMNS --- */
+#gameSection,
+.game-layout,
+.main-game-area {
+  width: auto !important;
+  min-width: unset !important;
+  max-width: unset !important;
+  box-sizing: border-box !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+/* --- RESTORE BACKGROUND COLOR TO PERSONAL SCORE HUD --- */
+.high-scores-hud {
+  background: #23232b !important;
+}
+
+/* --- ADD 20PX PADDING TO MAIN COLUMNS ON SIMULATION STAGE --- */
+.plant-hud,
+#gameContainer,
+.high-scores-hud {
+  padding: 20px !important;
+}
+
+/* --- MATCH PLANT HUD CONTENT TO PADDED AREA --- */
+.plant-image-section {
+  height: 390px !important;
+  min-height: 200px !important;
+  max-height: 410px !important;
+}
+#seedSoilDisplay {
+  margin-top: 10px !important;
+  margin-bottom: 0 !important;
+}
+
+/* --- MAKE ICONS BELOW PLANT ANIMATION FIT REMAINING SPACE --- */
+.plant-hud {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+}
+.plant-image-section {
+  flex: 0 0 370px !important;
+  height: 370px !important;
+  min-height: 200px !important;
+  max-height: 410px !important;
+}
+#seedSoilDisplay {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  margin-top: 10px !important;
+  margin-bottom: 0 !important;
+  height: auto !important;
+}
+#seedSoilDisplay .seed-soil-square {
+  height: 100% !important;
+  max-height: 64px !important;
+  width: 64px !important;
+  margin: 0 4px !important;
+  display: inline-block !important;
+  vertical-align: bottom !important;
+}
+
+/* --- RESTORE STATIC LAYOUT AND FIT ICONS BELOW PLANT ANIMATION --- */
+.plant-hud {
+  display: inline-block !important;
+  vertical-align: top !important;
+  width: 260px !important;
+  height: 500px !important;
+  box-sizing: border-box !important;
+  padding: 20px !important;
+}
+
+.plant-image-section {
+  height: 370px !important;
+  min-height: 200px !important;
+  max-height: 410px !important;
+}
+
+#seedSoilDisplay {
+  height: 64px !important;
+  margin-top: 10px !important;
+  margin-bottom: 0 !important;
+  display: block !important;
+  text-align: center !important;
+}
+
+#seedSoilDisplay .seed-soil-square {
+  height: 64px !important;
+  width: 64px !important;
+  margin: 0 4px !important;
+  display: inline-block !important;
+  vertical-align: bottom !important;
+}
+
+#seedSoilDisplay {
+  height: 55px !important;
+  margin-top: 10px !important;
+  margin-bottom: 0 !important;
+  display: block !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+}
+#seedSoilDisplay .seed-soil-square {
+  width: 51px !important;
+  height: 51px !important;
+  margin: 0 2px !important;
+  display: inline-block !important;
+  vertical-align: bottom !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  border: 1px solid rgba(191, 207, 255, 0.3) !important;
+  border-radius: 4px !important;
+  background: rgba(35, 35, 43, 0.5) !important;
+  overflow: hidden !important;
+}
+#seedSoilDisplay .seed-soil-square img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: fill !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.plant-image-section {
+  height: 390px !important;
+}
+
+/* --- FORCE SIMULATION ICONS TO FILL SQUARES, OVERRIDING ALL PREVIOUS RULES --- */
+#seedSoilDisplay .seed-soil-square img {
+  width: 51px !important;
+  height: 51px !important;
+  object-fit: fill !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  min-width: 51px !important;
+  min-height: 51px !important;
+  max-width: 51px !important;
+  max-height: 51px !important;
+}
+
+.seed-soil-slot {
+  width: 64px; /* or whatever size you want */
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #23232b;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #bfcfff;
+}
+
+.seed-soil-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* or 'cover' if you want to crop */
+  display: block;
+}
+
+.personal-score-label {
+  font-size: 0.7em !important;
+}
+
+#potencyScores,
+#yieldScores,
+#totalPersonalYield {
+  min-height: 140px;
+  max-height: 140px;
+  height: 140px;
+  overflow-y: auto;
+}
+
+#harvestResults .stat-item {
+  font-size: 0.85em !important;
+  margin: 5px 0 !important; /* 10px total between rows */
+  padding: 0 !important;
+  line-height: 1.1 !important;
+}
+#harvestResults .stat-label,
+#harvestResults .stat-item span:not(.stat-label) {
+  font-size: 1.2em !important;
+  padding: 0 !important;
+  line-height: 1.6 !important;
+}

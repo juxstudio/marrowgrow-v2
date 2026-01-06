@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="new.css">
+    <title>Marrow Grow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://download.playfab.com/PlayFabClientApi.js"></script>
+</head>
+
+<body>
+
+    <!-- Loading Screen - shows first -->
+    <div class="loadingScreen" id="loadingScreen">
+        <div class="loadingContent">
+            <h1 class="loadingTitle">Marrow Grow</h1>
+            <div class="loadingSpinner"></div>
+            <p class="loadingText">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Auth Panel - shows when not logged in -->
+    <div class="authPanel">
+        <div class="authPanelTitle">
+            <h2>Marrow Grow</h2>
+            <h2 class="textGrow">New Grower?</h2>
+        </div>
+
+        <div class="authPanelButtons" id="authPanelButtons">
+            <button class="authPanelButton" onclick="handleGoogleLogin()">
+                <img src="img/icons/google.svg" alt="Google" class="button-icon">
+                Login with Google
+            </button>
+            <button class="authPanelButton" onclick="showLoginForm()">
+                Sign In (Old Growers)
+            </button>
+            <button class="authPanelButton discord-button">
+                <img src="img/icons/discord.svg" alt="Discord" class="button-icon">
+                <a href="http://discord.gg/RUEJS6Hk">Discord this way</a>
+            </button>
+        </div>
+
+        <div class="loginForm" id="loginForm" style="display: none;">
+            <div class="formTitle">
+                <h3>Sign In</h3>
+            </div>
+            <form class="loginFormFields" onsubmit="handleLogin(event)">
+                <input type="text" placeholder="Username" class="formInput" required oninput="validateLoginForm()">
+                <input type="password" placeholder="Password" class="formInput" required oninput="validateLoginForm()">
+                <button type="submit" class="formButton" id="loginBtn">Sign In</button>
+            </form>
+            <div class="formFooter">
+                <button class="formButton secondary" onclick="showAuthButtons()">Back</button>
+            </div>
+        </div>
+
+        <div class="usernamePickerForm" id="usernamePickerForm" style="display: none;">
+            <div class="formTitle">
+                <h3>Pick Your Grower Name</h3>
+            </div>
+            <form class="loginFormFields" onsubmit="handleUsernamePicker(event)">
+                <input type="text" placeholder="Enter grower name" class="formInput" id="pickerUsernameInput" required
+                    maxlength="20" oninput="validateUsernameForm()">
+                <button type="submit" class="formButton" id="usernamePickerBtn">Confirm Name</button>
+            </form>
+        </div>
+    </div>
+    <!-- GROWLAB Interface - outside authPanel to avoid nesting issues -->
+    <div class="mainGameScreen" id="mainGameScreen" style="display: none;">
+        <div class="gameHeader">
+            <button class="navButton left" id="vaultBtn">
+                <span>← Vault</span>
+            </button>
+
+            <h1 class="gameTitle" id="growlabLink">GROWLAB</h1>
+
+            <button class="navButton right" id="leaderboardBtn">
+                Leaderboard <span>←</span>
+            </button>
+        </div>
+
+        <div class="gameContent">
+            <!-- Selection Component -->
+            <div id="selection-component" class="component active">
+                <div class="selectionLayout">
+                    <!-- Left side - Instructions -->
+                    <div class="instructionPanel">
+                        <h2 class="selectionTitle">SELECT YOUR GROW SET</h2>
+                        <p class="selectionSubtext">SELECT THE RIGHT COMBO:<br>SEED + SOIL + DEFENSE</p>
+                        <p class="selectionWarning">Seeds populate randomly.<br>Good luck. There's no<br>going back once
+                            you<br>begin the ritual.</p>
+
+                        <!-- Action Buttons Container -->
+                        <div class="actionButtonsContainer">
+                            <!-- Seeds Available Section -->
+                            <div class="seedsAvailableSection" id="seedsAvailableSection">
+                                <div class="livesDisplay" id="livesDisplay">
+                                    <div class="livesHeader" id="livesHeader">SEEDS: 00</div>
+                                    <button id="dailySpinBtn" class="dailySpinBtn">Daily Spin</button>
+                                </div>
+                            </div>
+
+                            <button id="beginRitualBtn" class="beginRitualBtn" disabled>Begin Ritual</button>
+                        </div>
+                    </div>
+
+                    <!-- Right side - Selection grids -->
+                    <div class="selectionGrids">
+                        <div class="gridContainer">
+                            <div class="gridColumn">
+                                <h3 class="gridHeader">Seed</h3>
+                                <div class="itemGrid" id="seedGrid">
+                                    <!-- 3 seed options will go here -->
+                                </div>
+                            </div>
+                            <div class="gridColumn">
+                                <h3 class="gridHeader">Soil</h3>
+                                <div class="itemGrid" id="soilGrid">
+                                    <!-- 3 soil options will go here -->
+                                </div>
+                            </div>
+                            <div class="gridColumn">
+                                <h3 class="gridHeader">Defence</h3>
+                                <div class="itemGrid" id="defenseGrid">
+                                    <!-- 3 defense options will go here -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feeding Schedule Component -->
+            <div id="feeding-component" class="component">
+                <div class="feedingLayout">
+                    <!-- Instructions Panel (smaller) -->
+                    <div class="feedingInstructionPanel">
+                        <h2 class="selectionTitle">Feeding Schedule</h2>
+                        <p class="selectionSubtext">
+                            Set water times and nutrients<br>
+                            for each growth stage
+                        </p>
+                        <button class="beginRitualBtn" id="startGrowingBtn" disabled>Start Growing</button>
+                        <button class="beginRitualBtn secondary" id="randomFeedsBtn">Randomizer</button>
+                        <button class="beginRitualBtn secondary" id="backToSelectionBtn">Back to Seeds</button>
+                    </div>
+
+                    <!-- Feeding Grids -->
+                    <div class="feedingGrids">
+                        <div class="feedingContainer">
+                            <!-- Sprout Stage -->
+                            <div class="stageColumn">
+                                <h3 class="gridHeader">Sprout</h3>
+                                <div class="waterControls">
+                                    <button class="waterBtn minus" data-stage="sprout">-</button>
+                                    <div class="waterDisplay" id="sproutWater">0</div>
+                                    <button class="waterBtn plus" data-stage="sprout">+</button>
+                                </div>
+                                <div class="nutrientSelector" id="sproutNutrients">
+                                    <!-- Nutrient options will go here -->
+                                </div>
+                            </div>
+
+                            <!-- Vegetative Stage -->
+                            <div class="stageColumn">
+                                <h3 class="gridHeader">Veg</h3>
+                                <div class="waterControls">
+                                    <button class="waterBtn minus" data-stage="vegetative">-</button>
+                                    <div class="waterDisplay" id="vegetativeWater">0</div>
+                                    <button class="waterBtn plus" data-stage="vegetative">+</button>
+                                </div>
+                                <div class="nutrientSelector" id="vegetativeNutrients">
+                                    <!-- Nutrient options will go here -->
+                                </div>
+                            </div>
+
+                            <!-- Flowering Stage -->
+                            <div class="stageColumn">
+                                <h3 class="gridHeader">Flowering</h3>
+                                <div class="waterControls">
+                                    <button class="waterBtn minus" data-stage="flowering">-</button>
+                                    <div class="waterDisplay" id="floweringWater">0</div>
+                                    <button class="waterBtn plus" data-stage="flowering">+</button>
+                                </div>
+                                <div class="nutrientSelector" id="floweringNutrients">
+                                    <!-- Nutrient options will go here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Simulation Component -->
+            <div id="game-component" class="component">
+                <div class="gameSimulationLayout">
+                    <!-- Left side - Plant visualization -->
+                    <div class="plantVisualPanel">
+                        <div class="plantImageContainer">
+                            <img id="plantStageImage" src="img/stages/bloom1.png" alt="Plant Stage" />
+                        </div>
+                    </div>
+
+                    <!-- Right side - Game HUD -->
+                    <div class="gameHUD">
+                        <!-- Top status info -->
+                        <div class="topStatusBar">
+                            <div class="statusGroup">
+                                <div class="statusLabel">STRAIN</div>
+                                <div class="statusValue" id="strainName">Sundaez</div>
+                            </div>
+                            <div class="statusGroup">
+                                <div class="statusLabel">STAGE</div>
+                                <div class="statusValue" id="currentStage">VEG</div>
+                            </div>
+                            <div class="statusGroup">
+                                <div class="statusLabel">HEALTH</div>
+                                <div class="statusValue" id="healthValue">19%</div>
+                            </div>
+                        </div>
+
+                        <!-- Resource bars -->
+                        <div class="resourceBars">
+                            <div class="resourceRow">
+                                <span class="resourceLabel">Growth</span>
+                                <div class="resourceBarContainer">
+                                    <div class="resourceBarFill green" id="growthBar" style="width: 45%"></div>
+                                </div>
+                            </div>
+                            <div class="resourceRow">
+                                <span class="resourceLabel">Water</span>
+                                <div class="resourceBarContainer">
+                                    <div class="resourceBarFill blue" id="waterBar" style="width: 95%"></div>
+                                </div>
+                            </div>
+                            <div class="resourceRow">
+                                <span class="resourceLabel">Light</span>
+                                <div class="resourceBarContainer">
+                                    <div class="resourceBarFill yellow" id="lightBar" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <div class="resourceRow">
+                                <span class="resourceLabel">Nutes</span>
+                                <div class="resourceBarContainer">
+                                    <div class="resourceBarFill purple" id="nutrientBar" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <div class="resourceRow">
+                                <span class="resourceLabel">Stress</span>
+                                <div class="resourceBarContainer">
+                                    <div class="resourceBarFill red" id="stressBar" style="width: 35%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Light source buttons -->
+                        <div class="lightSources">
+                            <button class="lightBtn active">Candle Light</button>
+                            <button class="lightBtn">Desk Lamp</button>
+                            <button class="lightBtn active">Grow Light</button>
+                            <button class="lightBtn disabled">Plasma Lamp<br>1500g</button>
+                            <button class="lightBtn disabled">Quantum Board<br>2100g</button>
+                        </div>
+
+                        <!-- Events and Selection Icons Container -->
+                        <div class="eventsAndIconsContainer">
+                            <!-- Events section - narrower -->
+                            <div class="eventsSection">
+                                <div class="eventsHeader">Events</div>
+                                <div class="eventsList">
+                                    <div class="eventItem warning">Mini martians are abducting your nutrients!</div>
+                                    <div class="eventItem info">Lights are back on!</div>
+                                    <div class="eventItem warning">Lights have gone out! Fix them quickly!</div>
+                                    <div class="eventItem info">Lights are back on!</div>
+                                    <div class="eventItem error">Fungal Gremlins reduced potency by 8%</div>
+                                </div>
+                            </div>
+
+                            <!-- Selection icons in 2x2 grid -->
+                            <div class="selectionIconsGrid">
+                                <div class="iconSquare" id="seedIcon"></div>
+                                <div class="iconSquare" id="soilIcon"></div>
+                                <div class="iconSquare" id="defenseIcon"></div>
+                                <div class="iconSquare" id="lightIcon"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Harvest Component -->
+            <div id="harvest-component" class="component">
+                <div class="harvestLayout">
+                    <!-- Left side - Plant image -->
+                    <div class="harvestPlantSection">
+                        <div class="harvestPlantImage">
+                            <img id="harvestPlantImage" src="img/stages/harvest.png" alt="Harvested Plant" />
+                        </div>
+                    </div>
+
+                    <!-- Right side - Results -->
+                    <div class="harvestResultsSection">
+                        <h2 class="selectionTitle">Harvest Complete!</h2>
+
+                        <!-- Grower and Strain Info -->
+                        <div class="harvestInfo">
+                            <div class="harvestInfoRow">
+                                <span class="harvestInfoLabel">Grower:</span>
+                                <span class="harvestInfoValue" id="harvestGrowerName">Unknown</span>
+                            </div>
+                            <div class="harvestInfoRow">
+                                <span class="harvestInfoLabel">Strain:</span>
+                                <span class="harvestInfoValue" id="harvestStrainName">Unknown Strain</span>
+                            </div>
+                        </div>
+
+                        <div class="harvestStats">
+                            <div class="statRow">
+                                <span class="statLabel">Final Potency:</span>
+                                <span class="statValue" id="finalPotency">0%</span>
+                            </div>
+                            <div class="statRow">
+                                <span class="statLabel">Final Weight:</span>
+                                <span class="statValue" id="finalWeight">0g</span>
+                            </div>
+                        </div>
+
+                        <div class="harvestActions">
+                            <button class="beginRitualBtn" id="newGameHarvestBtn">New Game</button>
+                            <button class="beginRitualBtn secondary" id="lookForSeedsBtn">Look for Seeds</button>
+                            <button class="beginRitualBtn secondary" id="copyImageBtn">Copy Image</button>
+                            <div id="lookForSeedsMsg"
+                                style="color:#ffd700;font-family:'Press Start 2P',monospace;margin-top:10px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vault Component (TABS OUTSIDE CONTAINER) -->
+            <div id="vault-component" class="component">
+                <!-- Tab Navigation - Outside Container -->
+                <div class="vaultTabs">
+                    <button class="vaultTab active" data-tab="seeds">SEEDS</button>
+                    <button class="vaultTab" data-tab="badges">BADGES</button>
+                    <button class="vaultTab" data-tab="equips">EQUIPS</button>
+                </div>
+
+                <!-- Main Content Area - Full Container Space -->
+                <div class="vaultContent">
+                    <!-- Left side - Grid/Collection -->
+                    <div class="vaultGrid">
+                        <div class="vaultGridContainer">
+                            <!-- Seeds Tab Content -->
+                            <div class="tabContent active" id="seedsContent">
+                                <div class="gridScroll" id="vaultSeedGrid">
+                                    <!-- Seeds will populate here -->
+                                </div>
+                            </div>
+
+                            <!-- Badges Tab Content -->
+                            <div class="tabContent" id="badgesContent">
+                                <div class="gridScroll" id="vaultBadgeGrid">
+                                    <!-- Badges will populate here -->
+                                </div>
+                            </div>
+
+                            <!-- Equips Tab Content -->
+                            <div class="tabContent" id="equipsContent">
+                                <div class="gridScroll" id="vaultEquipGrid">
+                                    <!-- Equipment will populate here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right side - Detail View -->
+                    <div class="vaultDetail">
+                        <div class="detailView" id="detailView">
+                            <div class="emptyDetail">
+                                <p>Select an item to view details</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Leaderboard Component -->
+            <div id="leaderboard-component" class="component">
+                <div class="leaderboardLayout">
+                    <h2 class="selectionTitle">Global Leaderboard</h2>
+
+                    <div class="leaderboardContent">
+                        <!-- Potency Section -->
+                        <div class="leaderboardSection">
+                            <h3 class="leaderboardTitle">Potency</h3>
+                            <div class="leaderboardContainer">
+                                <div id="potencyCurrentUser" class="currentUserSection" style="display: none;">
+                                    <!-- Current user entry will go here -->
+                                </div>
+                                <div class="leaderboardScroll" id="potencyBoard">
+                                    <div class="noDataMessage">Loading...</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Yield Section -->
+                        <div class="leaderboardSection">
+                            <h3 class="leaderboardTitle">Yield</h3>
+                            <div class="leaderboardContainer">
+                                <div id="yieldCurrentUser" class="currentUserSection" style="display: none;">
+                                    <!-- Current user entry will go here -->
+                                </div>
+                                <div class="leaderboardScroll" id="yieldBoard">
+                                    <div class="noDataMessage">Loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="beginRitualBtn secondary" id="backFromLeaderboard">Back to Game</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="helpButton" id="logoutBtn">
+            ⏻ <!-- Power Symbol -->
+        </button>
+
+    </div>
+
+    <!-- Sound Toggle Button - Global, visible on all screens -->
+    <button class="soundButton" id="soundToggleBtn" title="Toggle Sound">
+        <span class="sound-icon" id="soundIcon">🔊</span>
+    </button>
+
+    <script src="config.js"></script>
+    <script src="storage.js"></script>
+    <script src="view.js"></script>
+    <script src="playfab-service.js"></script>
+    <script src="missing-data.js"></script>
+    <script src="daily-spin.js"></script>
+    <script src="badge-modal.js"></script>
+    <script src="newgame.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://accounts.google.com/gsi/client" onload="initClient()" async defer></script>
+
+    <script>
+        // Initialize Google client after SDK loads
+        function initClient() {
+            // Wait for the JavaScript file to load and then initialize
+            const checkAndInit = () => {
+                if (typeof initializeGoogleClient === 'function') {
+                    initializeGoogleClient();
+                } else {
+                    // If function not found yet, wait a bit more
+                    setTimeout(checkAndInit, 100);
+                }
+            };
+
+            // Start checking after a short delay
+            setTimeout(checkAndInit, 200);
+        }
+    </script>
+
+    <!-- Daily Slots Modal -->
+    <div id="slotsModal" class="slotsModal hidden">
+        <div class="slotsModalContent">
+            <h2>Daily Seed Spin</h2>
+            <div class="slotsContainer">
+                <div class="slot" id="slot1">🌱</div>
+                <div class="slot" id="slot2">💰</div>
+                <div class="slot" id="slot3">⚡</div>
+            </div>
+            <div id="slotsResultMsg">Spins left today: 1</div>
+            <button id="spinSlotsBtn" class="spinButton">SPIN</button>
+            <button id="continueSlotsBtn" class="continueButton" style="display: none;">Continue</button>
+        </div>
+    </div>
+
+    <!-- Badge Modal -->
+    <div id="badgeModal" class="badgeModal">
+        <div class="badgeModalContent">
+            <div class="badgeModalHeader">🏆 BADGE UNLOCKED! 🏆</div>
+            <div id="badgeModalIcon" class="badgeIcon">
+                <div class="placeholder">🏆</div>
+            </div>
+            <div id="badgeModalName" class="badgeName">Badge Name</div>
+            <div id="badgeModalDescription" class="badgeDescription">Badge Description</div>
+            <button id="badgeModalClose" class="badgeModalClose">Continue</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+</body>
+
+</html>
