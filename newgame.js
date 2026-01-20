@@ -199,15 +199,6 @@ function hideRoomTransition() {
 async function showComponent(componentName) {
   console.log(`🔄 [DEBUG] Showing component: ${componentName}`);
 
-  // Determine if we need a loading transition (for data-heavy components)
-  const needsTransition = componentName === 'vault' || componentName === 'leaderboard';
-
-  if (needsTransition) {
-    showRoomTransition();
-    // Small delay to let overlay fade in
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
-
   // Reset state when returning to selection screen
   if (componentName === "selection") {
     resetGameState();
@@ -229,7 +220,7 @@ async function showComponent(componentName) {
     targetComponent.classList.add("active");
     console.log(`✅ Switched to ${componentName} component`);
 
-    // Change background image based on component
+    // Change background image based on component (images are preloaded on startup)
     changeBackgroundForComponent(componentName);
 
     // Test: Verify only one component is active
@@ -264,13 +255,6 @@ async function showComponent(componentName) {
 
   // Always refresh lives UI when switching components
   refreshLivesUI();
-
-  // Hide transition after component is ready
-  if (needsTransition) {
-    // Small delay to ensure content is rendered
-    await new Promise(resolve => setTimeout(resolve, 150));
-    hideRoomTransition();
-  }
 }
 
 // Update header title based on active component
@@ -291,23 +275,35 @@ function updateHeaderTitle(componentName) {
   console.log(`[NAV] Header title updated to: ${titleElement.textContent}`);
 }
 
+// Define background images for each component (shared for preloading and switching)
+const ROOM_BACKGROUNDS = {
+  vault: "/img/selections/vault.png",
+  leaderboard: "/img/selections/leaderboard.png",
+  selection: "/img/selections/bg.png",
+  feeding: "/img/selections/bg.png",
+  game: "/img/selections/bg.png",
+  harvest: "/img/selections/bg.png",
+};
+
+// Preload all room background images on game startup
+function preloadBackgroundImages() {
+  console.log("🖼️ Preloading room background images...");
+  const uniqueImages = [...new Set(Object.values(ROOM_BACKGROUNDS))];
+
+  uniqueImages.forEach(src => {
+    const img = new Image();
+    img.src = src;
+    console.log(`🖼️ Preloading: ${src}`);
+  });
+}
+
 // Function to change background image based on active component
 function changeBackgroundForComponent(componentName) {
   const body = document.body;
   const loadingScreen = document.getElementById("loadingScreen");
 
-  // Define background images for each component
-  const backgroundImages = {
-    vault: "/img/selections/vault.png",
-    leaderboard: "/img/selections/leaderboard.png",
-    selection: "/img/selections/bg.png",
-    feeding: "/img/selections/bg.png",
-    game: "/img/selections/bg.png",
-    harvest: "/img/selections/bg.png",
-  };
-
   const backgroundImage =
-    backgroundImages[componentName] || "/img/selections/bg.png";
+    ROOM_BACKGROUNDS[componentName] || "/img/selections/bg.png";
 
   // Update body background
   body.style.backgroundImage = `url("${backgroundImage}")`;
@@ -362,6 +358,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     console.log("Initializing PlayFab...");
     PlayFabService.initialize();
     console.log("PlayFab initialized successfully");
+
+    // Preload room background images early to prevent flash during navigation
+    preloadBackgroundImages();
 
     // Try auto-login
     const autoLoggedIn = await checkAutoLogin();
