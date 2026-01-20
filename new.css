@@ -1,3 +1,13 @@
+/* Preload room background images to prevent flash on first navigation */
+body::before {
+  content: "";
+  display: none;
+  background-image:
+    url("/img/selections/bg.png"),
+    url("/img/selections/vault.png"),
+    url("/img/selections/leaderboard.png");
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
