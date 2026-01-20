@@ -115,6 +115,7 @@ handlers.submitScore = function (args, context) {
       totalGrows: 0,
       badges: [],
       badgePopupsShown: [],
+      grownStrains: [],
       currentTier: 1,
       consecutiveLogins: 0,
       lastLoginDate: null,
@@ -202,6 +203,11 @@ handlers.submitScore = function (args, context) {
 
       // Update yield tracking
       playerProgress.totalYield += scoreValue;
+
+      // Track this strain as grown (for vault flower preview unlocking)
+      if (gameState.seedType && playerProgress.grownStrains.indexOf(gameState.seedType) === -1) {
+        playerProgress.grownStrains.push(gameState.seedType);
+      }
 
       // Update highest records
       var potency = gameState.frozenStats ? gameState.frozenStats.potency : 0;
@@ -409,7 +415,7 @@ handlers.recordSlotsWin = function (args, context) {
   if (userDataResult.Data && userDataResult.Data.playerProgress) {
     try {
       playerProgress = JSON.parse(userDataResult.Data.playerProgress.Value);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   playerProgress.slotsWins = (playerProgress.slotsWins || 0) + 1;
@@ -460,7 +466,8 @@ handlers.getPlayerProgress = function (args, context) {
     var playerProgress = {
       totalGrows: 0,
       badges: [],
-      badgePopupsShown: [], // NEW FIELD
+      badgePopupsShown: [],
+      grownStrains: [],
       currentTier: 1,
     };
 
@@ -474,6 +481,10 @@ handlers.getPlayerProgress = function (args, context) {
         // Ensure badgePopupsShown exists for existing players
         if (!playerProgress.badgePopupsShown) {
           playerProgress.badgePopupsShown = [];
+        }
+        // Ensure grownStrains exists for existing players
+        if (!playerProgress.grownStrains) {
+          playerProgress.grownStrains = [];
         }
       } catch (e) {
         // Keep default values if parsing fails

@@ -4,7 +4,7 @@
 const seedProperties = {
   // TIER 1 (OK) - Basic seeds, some stinkers
   seed1: {
-    name: "Crypt Cookies",
+    name: "Sailor Sktlz",
     waterDrain: 0.6,
     nutrientDrain: 0.6,
     image: "seeds/seed1.png",
@@ -12,7 +12,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed2: {
-    name: "Slime 33",
+    name: "Nifty Nugz",
     waterDrain: 0.4,
     nutrientDrain: 0.4,
     image: "seeds/seed2.png",
@@ -20,7 +20,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed3: {
-    name: "Jet Fuel",
+    name: "PNK Panther",
     waterDrain: 0.4,
     nutrientDrain: 0.6,
     image: "seeds/seed3.png",
@@ -28,7 +28,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed4: {
-    name: "Rotjaw",
+    name: "Ember Sherb",
     waterDrain: 0.5,
     nutrientDrain: 0.5,
     image: "seeds/seed4.png",
@@ -36,7 +36,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed5: {
-    name: "Vader Breath",
+    name: "Burzt",
     waterDrain: 0.5,
     nutrientDrain: 0.5,
     image: "seeds/seed5.png",
@@ -44,7 +44,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed6: {
-    name: "Lazy Bones",
+    name: "Vader Breath X2",
     waterDrain: 0.4,
     nutrientDrain: 0.5,
     image: "seeds/seed6.png",
@@ -54,7 +54,7 @@ const seedProperties = {
 
   // TIER 2 (GOOD) - Better seeds, some stinkers
   seed7: {
-    name: "Gloomberry",
+    name: "Hufflepuffz",
     waterDrain: 0.4,
     nutrientDrain: 0.4,
     image: "seeds/seed7.png",
@@ -62,7 +62,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed8: {
-    name: "Phantom Fruit",
+    name: "Grillz Glue",
     waterDrain: 0.4,
     nutrientDrain: 0.3,
     image: "seeds/seed8.png",
@@ -70,7 +70,7 @@ const seedProperties = {
     desc: "TIER 2 GEM: slow drain.",
   },
   seed9: {
-    name: "Diesel Drip",
+    name: "Dripsicle",
     waterDrain: 0.5,
     nutrientDrain: 0.5,
     image: "seeds/seed9.png",
@@ -78,7 +78,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed10: {
-    name: "Hotdog Water",
+    name: "Hot Sauce",
     waterDrain: 0.3,
     nutrientDrain: 0.4,
     image: "seeds/seed10.png",
@@ -86,7 +86,7 @@ const seedProperties = {
     desc: "TIER 2 GEM: slow drain.",
   },
   seed11: {
-    name: "Sundaez",
+    name: "Grillz Gas",
     waterDrain: 0.3,
     nutrientDrain: 0.5,
     image: "seeds/seed11.png",
@@ -94,7 +94,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed12: {
-    name: "Skele OG",
+    name: "Gorilla Grillz",
     waterDrain: 0.3,
     nutrientDrain: 0.3,
     image: "seeds/seed12.png",
@@ -102,7 +102,7 @@ const seedProperties = {
     desc: "TIER 2 GEM: slow drain.",
   },
   seed13: {
-    name: "Marrow Melon",
+    name: "Wisp Widow",
     waterDrain: 0.5,
     nutrientDrain: 0.5,
     image: "seeds/seed13.png",
@@ -110,7 +110,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed14: {
-    name: "Pineal Punch",
+    name: "Pixie Sherb",
     waterDrain: 0.5,
     nutrientDrain: 0.4,
     image: "seeds/seed14.png",
@@ -118,7 +118,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed15: {
-    name: "Ghoul Gas",
+    name: "Dunk OG",
     waterDrain: 0.5,
     nutrientDrain: 0.4,
     image: "seeds/seed15.png",
@@ -126,7 +126,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed16: {
-    name: "Tomb Tangle",
+    name: "Red Croptober",
     waterDrain: 0.3,
     nutrientDrain: 0.5,
     image: "seeds/seed16.png",
@@ -134,7 +134,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed17: {
-    name: "Wraithwreck",
+    name: "Fuego 42",
     waterDrain: 0.5,
     nutrientDrain: 0.4,
     image: "seeds/seed17.png",
@@ -142,7 +142,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed18: {
-    name: "Grillz Glue",
+    name: "Dragon Scale",
     waterDrain: 0.5,
     nutrientDrain: 0.5,
     image: "seeds/seed18.png",
@@ -152,7 +152,7 @@ const seedProperties = {
 
   // TIER 3 (BEST) - Premium seeds, some stinkers
   seed19: {
-    name: "Grave Grape",
+    name: "Teslaterp",
     waterDrain: 0.3,
     nutrientDrain: 0.4,
     image: "seeds/seed19.png",
@@ -160,7 +160,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed20: {
-    name: "Sour Spectre",
+    name: "Skelli Dream",
     waterDrain: 0.2,
     nutrientDrain: 0.3,
     image: "seeds/seed20.png",
@@ -168,7 +168,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed21: {
-    name: "Ghastleaf",
+    name: "Infernal Gelato",
     waterDrain: 0.4,
     nutrientDrain: 0.2,
     image: "seeds/seed21.png",
@@ -176,7 +176,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed22: {
-    name: "Eth Jack",
+    name: "Slime Cap",
     waterDrain: 0.4,
     nutrientDrain: 0.3,
     image: "seeds/seed22.png",
@@ -184,7 +184,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed23: {
-    name: "Pepe Zkittles",
+    name: "Neo Caps",
     waterDrain: 0.4,
     nutrientDrain: 0.3,
     image: "seeds/seed23.png",
@@ -192,7 +192,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed24: {
-    name: "Bitbudz",
+    name: "Neo Caps II",
     waterDrain: 0.2,
     nutrientDrain: 0.3,
     image: "seeds/seed24.png",
@@ -200,7 +200,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed25: {
-    name: "Wet Dream",
+    name: "Ice Walker",
     waterDrain: 0.3,
     nutrientDrain: 0.4,
     image: "seeds/seed25.png",
@@ -208,7 +208,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed26: {
-    name: "Phantom Pheno",
+    name: "Moon Bat Haze",
     waterDrain: 0.3,
     nutrientDrain: 0.4,
     image: "seeds/seed26.png",
@@ -216,7 +216,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed27: {
-    name: "Hauntberry",
+    name: "Blue Grim",
     waterDrain: 0.2,
     nutrientDrain: 0.4,
     image: "seeds/seed27.png",
@@ -224,7 +224,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed28: {
-    name: "Panda Puff",
+    name: "Blue Grim II",
     waterDrain: 0.3,
     nutrientDrain: 0.2,
     image: "seeds/seed28.png",
@@ -232,7 +232,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed29: {
-    name: "Moonbat OG",
+    name: "Croiscrumble",
     waterDrain: 0.4,
     nutrientDrain: 0.4,
     image: "seeds/seed29.png",
@@ -240,7 +240,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed30: {
-    name: "Doom Daisy",
+    name: "Dojo Diesel",
     waterDrain: 0.4,
     nutrientDrain: 0.4,
     image: "seeds/seed30.png",
@@ -248,7 +248,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed31: {
-    name: "Skele Skunk",
+    name: "Blutane",
     waterDrain: 0.2,
     nutrientDrain: 0.4,
     image: "seeds/seed31.png",
@@ -256,7 +256,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed32: {
-    name: "CthulKush",
+    name: "Cthul Kush",
     waterDrain: 0.4,
     nutrientDrain: 0.2,
     image: "seeds/seed32.png",
@@ -264,7 +264,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed33: {
-    name: "CthulKush",
+    name: "Cthul Kush II",
     waterDrain: 0.2,
     nutrientDrain: 0.4,
     image: "seeds/seed33.png",
@@ -272,7 +272,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed34: {
-    name: "BubblRntz",
+    name: "Bubbl Rntz",
     waterDrain: 0.3,
     nutrientDrain: 0.2,
     image: "seeds/seed34.png",
@@ -280,7 +280,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed35: {
-    name: "JediKush",
+    name: "Jedi Kush",
     waterDrain: 0.3,
     nutrientDrain: 0.4,
     image: "seeds/seed35.png",
@@ -288,7 +288,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed36: {
-    name: "Pepe-OG",
+    name: "Pepe OG",
     waterDrain: 0.4,
     nutrientDrain: 0.4,
     image: "seeds/seed36.png",
@@ -296,7 +296,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed37: {
-    name: "AquaTort-G41",
+    name: "Aqua Tort G41",
     waterDrain: 0.3,
     nutrientDrain: 0.2,
     image: "seeds/seed37.png",
@@ -304,7 +304,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed38: {
-    name: "VoltLa",
+    name: "Volt La",
     waterDrain: 0.4,
     nutrientDrain: 0.4,
     image: "seeds/seed38.png",
@@ -312,7 +312,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed39: {
-    name: "PandaManiaOG",
+    name: "Panda Mania OG",
     waterDrain: 0.2,
     nutrientDrain: 0.3,
     image: "seeds/seed39.png",
@@ -320,7 +320,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed40: {
-    name: "SKFZGMO",
+    name: "SKFZ GMO",
     waterDrain: 0.3,
     nutrientDrain: 0.3,
     image: "seeds/seed40.png",
@@ -328,7 +328,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed41: {
-    name: "SKFZGMO",
+    name: "SKFZ GMO II",
     waterDrain: 0.4,
     nutrientDrain: 0.3,
     image: "seeds/seed41.png",
@@ -336,7 +336,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed42: {
-    name: "SKFZGMO",
+    name: "SKFZ GMO III",
     waterDrain: 0.4,
     nutrientDrain: 0.4,
     image: "seeds/seed42.png",
@@ -344,7 +344,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed43: {
-    name: "PassionPanda",
+    name: "Passion Panda",
     waterDrain: 0.2,
     nutrientDrain: 0.2,
     image: "seeds/seed43.png",
@@ -352,7 +352,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed44: {
-    name: "PassionPanda",
+    name: "Passion Panda II",
     waterDrain: 0.4,
     nutrientDrain: 0.4,
     image: "seeds/seed44.png",
@@ -368,7 +368,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed46: {
-    name: "Detox",
+    name: "Detox II",
     waterDrain: 0.4,
     nutrientDrain: 0.4,
     image: "seeds/seed46.png",
@@ -376,7 +376,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed47: {
-    name: "Grillz-Cookies",
+    name: "Grillz Cookies",
     waterDrain: 0.3,
     nutrientDrain: 0.3,
     image: "seeds/seed47.png",
@@ -384,7 +384,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed48: {
-    name: "PurpleHeartz",
+    name: "Purple Heartz",
     waterDrain: 0.3,
     nutrientDrain: 0.2,
     image: "seeds/seed48.png",
@@ -392,7 +392,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed49: {
-    name: "Lyle-OG",
+    name: "Lyle OG",
     waterDrain: 0.4,
     nutrientDrain: 0.2,
     image: "seeds/seed49.png",
@@ -400,7 +400,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed50: {
-    name: "KuromiKush",
+    name: "Kuromi Kush",
     waterDrain: 0.3,
     nutrientDrain: 0.4,
     image: "seeds/seed50.png",
@@ -408,7 +408,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed51: {
-    name: "HelloNuggy",
+    name: "Hello Nuggy",
     waterDrain: 0.4,
     nutrientDrain: 0.3,
     image: "seeds/seed51.png",
@@ -416,7 +416,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed52: {
-    name: "HelloNuggy",
+    name: "Hello Nuggy II",
     waterDrain: 0.4,
     nutrientDrain: 0.2,
     image: "seeds/seed52.png",
@@ -424,7 +424,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed53: {
-    name: "HelloNuggy",
+    name: "Hello Nuggy III",
     waterDrain: 0.3,
     nutrientDrain: 0.3,
     image: "seeds/seed53.png",
@@ -440,7 +440,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed55: {
-    name: "PMFUNK",
+    name: "PM Funk",
     waterDrain: 0.4,
     nutrientDrain: 0.2,
     image: "seeds/seed55.png",
@@ -448,7 +448,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed56: {
-    name: "EthJack",
+    name: "Eth Jack",
     waterDrain: 0.3,
     nutrientDrain: 0.3,
     image: "seeds/seed56.png",
@@ -456,7 +456,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed57: {
-    name: "BioPepe",
+    name: "Bio Pepe",
     waterDrain: 0.2,
     nutrientDrain: 0.4,
     image: "seeds/seed57.png",
@@ -464,7 +464,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed58: {
-    name: "DOA47",
+    name: "DOA 47",
     waterDrain: 0.3,
     nutrientDrain: 0.3,
     image: "seeds/seed58.png",
@@ -472,7 +472,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed59: {
-    name: "DOA47",
+    name: "DOA 47 II",
     waterDrain: 0.2,
     nutrientDrain: 0.2,
     image: "seeds/seed59.png",
@@ -480,7 +480,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed60: {
-    name: "DOA47",
+    name: "DOA 47 III",
     waterDrain: 0.3,
     nutrientDrain: 0.2,
     image: "seeds/seed60.png",
@@ -488,7 +488,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed61: {
-    name: "GlizzyGoo",
+    name: "Glizzy Goo",
     waterDrain: 0.2,
     nutrientDrain: 0.4,
     image: "seeds/seed61.png",
@@ -496,7 +496,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed62: {
-    name: "GrapeAPE",
+    name: "Grape APE",
     waterDrain: 0.3,
     nutrientDrain: 0.2,
     image: "seeds/seed62.png",
@@ -504,7 +504,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed63: {
-    name: "RedOne",
+    name: "Red One",
     waterDrain: 0.4,
     nutrientDrain: 0.4,
     image: "seeds/seed63.png",
@@ -512,7 +512,7 @@ const seedProperties = {
     desc: "Balanced, classic strain.",
   },
   seed64: {
-    name: "Prism-Zkit",
+    name: "Prism Zkit",
     waterDrain: 0.2,
     nutrientDrain: 0.3,
     image: "seeds/seed64.png",
@@ -520,7 +520,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed65: {
-    name: "Prism-Zkit",
+    name: "Prism Zkit II",
     waterDrain: 0.3,
     nutrientDrain: 0.2,
     image: "seeds/seed65.png",
@@ -528,7 +528,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed66: {
-    name: "Prism-Zkit",
+    name: "Prism Zkit III",
     waterDrain: 0.3,
     nutrientDrain: 0.3,
     image: "seeds/seed66.png",
@@ -536,7 +536,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed67: {
-    name: "Prism-Zkit",
+    name: "Prism Zkit IV",
     waterDrain: 0.3,
     nutrientDrain: 0.3,
     image: "seeds/seed67.png",
@@ -544,7 +544,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed68: {
-    name: "Prism-Zkit",
+    name: "Prism Zkit V",
     waterDrain: 0.3,
     nutrientDrain: 0.2,
     image: "seeds/seed68.png",
@@ -552,7 +552,7 @@ const seedProperties = {
     desc: "TIER 3 GEM: slow drain.",
   },
   seed69: {
-    name: "Prism-Zkit",
+    name: "Prism Zkit VI",
     waterDrain: 0.3,
     nutrientDrain: 0.4,
     image: "seeds/seed69.png",
@@ -989,9 +989,9 @@ function maybeTriggerEvent() {
 // 🐛 PEST SWATTING MINI-GAME v2
 // ===============================
 
-// Map different pest types to emoji sets
+// Map different pest types to emoji sets - limited to well-rendering bugs
 const pestEmojiMap = {
-  pest: ["🐛", "🪲", "🐌", "🦗", "🕷️"],
+  pest: ["🕷️", "🦗"],
   raider: ["🏴‍☠️", "🧛‍♂️", "🦹‍♂️"],
   nutrient: ["🧪", "🍄", "💧"],
 };

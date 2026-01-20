@@ -1,7 +1,12 @@
 const PlayFabService = {
   // Initialize PlayFab
   initialize() {
-    PlayFab.settings.titleId = "B6749"; // Set to Marrow Grow's PlayFab Title ID
+    // Use environment config if available, fallback to production
+    const titleId = (typeof CURRENT_ENV !== 'undefined' && CURRENT_ENV.TITLE_ID)
+      ? CURRENT_ENV.TITLE_ID
+      : "B6749";
+    PlayFab.settings.titleId = titleId;
+    console.log('PlayFab initialized with Title ID:', titleId);
   },
 
   // Session management
@@ -559,7 +564,7 @@ const PlayFabService = {
             if (
               storedAnswerHash &&
               storedAnswerHash ===
-                this.hashPassword(securityAnswer.toLowerCase())
+              this.hashPassword(securityAnswer.toLowerCase())
             ) {
               // Validate new password
               const validation = this.validatePassword(newPassword);

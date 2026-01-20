@@ -26,6 +26,119 @@ function clearAllCaches() {
   isSyncing = false;
 }
 
+// ========================================
+// HIDDEN HOTSPOT UI SYSTEM
+// ========================================
+
+// Toggle modal visibility for a component
+function toggleModal(componentId, expand) {
+  const hotspot = document.getElementById(`${componentId}Hotspot`);
+  const modal = document.getElementById(`${componentId}Modal`);
+
+  if (!hotspot || !modal) {
+    console.warn(`[HOTSPOT] Missing elements for ${componentId}`);
+    return;
+  }
+
+  if (expand) {
+    hotspot.classList.add('hidden');
+    modal.classList.add('expanded');
+    console.log(`[HOTSPOT] Expanded ${componentId} modal`);
+  } else {
+    hotspot.classList.remove('hidden');
+    modal.classList.remove('expanded');
+    console.log(`[HOTSPOT] Collapsed ${componentId} modal`);
+  }
+}
+
+// Initialize hotspot handlers for all components
+function initializeHotspotUI() {
+  console.log('[HOTSPOT] Initializing hidden hotspot UI system...');
+
+  // Selection component (Grow Lab - Tank)
+  const selectionHotspot = document.getElementById('selectionHotspot');
+  const minimizeSelectionBtn = document.getElementById('minimizeSelectionBtn');
+
+  if (selectionHotspot) {
+    selectionHotspot.addEventListener('click', () => toggleModal('selection', true));
+  }
+  if (minimizeSelectionBtn) {
+    minimizeSelectionBtn.addEventListener('click', () => toggleModal('selection', false));
+  }
+
+  // Vault component (Door)
+  const vaultHotspot = document.getElementById('vaultHotspot');
+  const minimizeVaultBtn = document.getElementById('minimizeVaultBtn');
+
+  if (vaultHotspot) {
+    vaultHotspot.addEventListener('click', () => toggleModal('vault', true));
+  }
+  if (minimizeVaultBtn) {
+    minimizeVaultBtn.addEventListener('click', () => toggleModal('vault', false));
+  }
+
+  // Leaderboard component (Screen)
+  const leaderboardHotspot = document.getElementById('leaderboardHotspot');
+  const minimizeLeaderboardBtn = document.getElementById('minimizeLeaderboardBtn');
+
+  if (leaderboardHotspot) {
+    leaderboardHotspot.addEventListener('click', () => toggleModal('leaderboard', true));
+  }
+  if (minimizeLeaderboardBtn) {
+    minimizeLeaderboardBtn.addEventListener('click', () => toggleModal('leaderboard', false));
+  }
+
+  console.log('[HOTSPOT] Hotspot UI initialized successfully');
+
+  // Initialize room navigation overlays
+  initializeRoomNavigation();
+}
+
+// Initialize room navigation overlay handlers
+function initializeRoomNavigation() {
+  console.log('[NAV] Initializing room navigation overlays...');
+
+  // Selection (Grow Lab) - left goes to Vault, right goes to Leaderboard
+  const selectionNavLeft = document.getElementById('selectionNavLeft');
+  const selectionNavRight = document.getElementById('selectionNavRight');
+
+  if (selectionNavLeft) {
+    selectionNavLeft.addEventListener('click', () => {
+      console.log('[NAV] Navigating from Selection to Vault');
+      showComponent('vault');
+    });
+  }
+  if (selectionNavRight) {
+    selectionNavRight.addEventListener('click', () => {
+      console.log('[NAV] Navigating from Selection to Leaderboard');
+      showComponent('leaderboard');
+    });
+  }
+
+  // Vault - right goes to Grow Lab (Selection)
+  const vaultNavRight = document.getElementById('vaultNavRight');
+
+  if (vaultNavRight) {
+    vaultNavRight.addEventListener('click', () => {
+      console.log('[NAV] Navigating from Vault to Selection');
+      showComponent('selection');
+    });
+  }
+
+  // Leaderboard - left goes to Grow Lab (Selection)
+  const leaderboardNavLeft = document.getElementById('leaderboardNavLeft');
+
+  if (leaderboardNavLeft) {
+    leaderboardNavLeft.addEventListener('click', () => {
+      console.log('[NAV] Navigating from Leaderboard to Selection');
+      showComponent('selection');
+    });
+  }
+
+  console.log('[NAV] Room navigation initialized successfully');
+}
+
+
 // Function to handle light equipment changes - defined early to prevent reference errors
 async function equipLight(lightKey) {
   if (!lightSources[lightKey]) {
@@ -47,7 +160,7 @@ async function equipLight(lightKey) {
   try {
     localStorage.setItem("currentLight", lightKey);
     localStorage.setItem("manualLightSelection", "true");
-  } catch (e) {}
+  } catch (e) { }
 
   updateLightSources();
   updateSelectionIcons();
@@ -109,8 +222,42 @@ function showComponent(componentName) {
     initializeSelectionScreen();
   }
 
+  // Initialize vault tabs and content when showing vault
+  if (componentName === "vault") {
+    initializeVaultTabs();
+    populateVaultSeeds();
+    populateVaultBadges();
+    populateVaultEquips();
+  }
+
+  // Initialize leaderboard when showing leaderboard
+  if (componentName === "leaderboard") {
+    loadLeaderboardData();
+  }
+
+  // Update header title based on component
+  updateHeaderTitle(componentName);
+
   // Always refresh lives UI when switching components
   refreshLivesUI();
+}
+
+// Update header title based on active component
+function updateHeaderTitle(componentName) {
+  const titleElement = document.getElementById('growlabLink');
+  if (!titleElement) return;
+
+  const titles = {
+    'selection': 'GROWLAB',
+    'feeding': 'GROWLAB',
+    'game': 'GROWLAB',
+    'harvest': 'GROWLAB',
+    'vault': 'VAULT',
+    'leaderboard': 'LEADERBOARD'
+  };
+
+  titleElement.textContent = titles[componentName] || 'GROWLAB';
+  console.log(`[NAV] Header title updated to: ${titleElement.textContent}`);
 }
 
 // Function to change background image based on active component
@@ -193,17 +340,37 @@ document.addEventListener("DOMContentLoaded", async function () {
       // Hide loading, show game
       loadingScreen.style.display = "none";
       mainGameScreen.style.display = "flex";
+
+      // Initialize hidden hotspot UI system
+      initializeHotspotUI();
     } else {
       console.log("No valid session, showing auth panel");
       // Hide loading, show auth
       loadingScreen.style.display = "none";
       authPanel.style.display = "block";
+
+      // Show dev login button in development mode
+      if (typeof ENVIRONMENT !== 'undefined' && ENVIRONMENT === 'development') {
+        const devBtn = document.getElementById('devLoginBtn');
+        if (devBtn) {
+          devBtn.style.display = 'block';
+          console.log("🔧 [DEV] Dev login button enabled");
+        }
+      }
     }
   } catch (error) {
     console.error("Initialization failed:", error);
     // On error, show auth panel
     loadingScreen.style.display = "none";
     authPanel.style.display = "block";
+
+    // Also show dev button on error in dev mode
+    if (typeof ENVIRONMENT !== 'undefined' && ENVIRONMENT === 'development') {
+      const devBtn = document.getElementById('devLoginBtn');
+      if (devBtn) {
+        devBtn.style.display = 'block';
+      }
+    }
   }
 });
 
@@ -601,7 +768,7 @@ async function handleLogin(event) {
     if (loginAttempts.count >= loginAttempts.maxAttempts) {
       const timeLeft = Math.ceil(
         (loginAttempts.lockoutDuration - (now - loginAttempts.lastAttempt)) /
-          1000
+        1000
       );
       if (timeLeft > 0) {
         alert(
@@ -727,6 +894,67 @@ function onLoginError(error) {
   console.error("Login failed:", error);
   alert("Login failed: " + error.message);
 }
+
+// Dev Login Handler - Creates or logs into a test account for development
+async function handleDevLogin() {
+  console.log("🔧 [DEV] Starting dev login...");
+
+  // Generate a unique dev username based on device/browser
+  const devUsername = "DevTester_" + Math.random().toString(36).substring(2, 8);
+  const devPassword = "devtest123";
+  const devSecurityQuestion = "Test Question";
+  const devSecurityAnswer = "test";
+
+  const loginBtn = document.getElementById("devLoginBtn");
+  if (loginBtn) {
+    loginBtn.disabled = true;
+    loginBtn.textContent = "🔧 Logging in...";
+  }
+
+  try {
+    // Try to register first (in case it's a new device)
+    try {
+      await PlayFabService.register(devUsername, devPassword, devSecurityQuestion, devSecurityAnswer);
+      console.log("🔧 [DEV] Created new dev account:", devUsername);
+    } catch (regError) {
+      // If registration fails, account might exist - try login
+      console.log("🔧 [DEV] Registration failed (might already exist):", regError);
+    }
+
+    // Now login
+    const result = await PlayFabService.login(devUsername, devPassword);
+    console.log("🔧 [DEV] Login successful:", result);
+
+    await PlayFabService.setDisplayName(devUsername);
+    currentGrower = devUsername;
+    PlayFabService.saveSession(devUsername, result.SessionTicket);
+
+    // Transition to game - same as regular sign-in flow
+    document.getElementById("loadingScreen").style.display = "none";
+    document.querySelector(".authPanel").style.display = "none";
+    document.getElementById("mainGameScreen").style.display = "flex";
+
+    // Initialize hotspot UI first  
+    initializeHotspotUI();
+
+    // Then render the seed selection interface
+    await renderSeedSelectionInterface();
+    console.log("🔧 [DEV] Dev login complete!");
+
+  } catch (error) {
+    console.error("🔧 [DEV] Dev login failed:", error);
+    alert("Dev login failed: " + (error.message || error));
+  } finally {
+    if (loginBtn) {
+      loginBtn.disabled = false;
+      loginBtn.textContent = "🔧 Dev Login (Test Account)";
+    }
+  }
+}
+
+// Make dev login globally accessible
+window.handleDevLogin = handleDevLogin;
+
 
 // Username Picker Functions
 function showUsernamePicker() {
@@ -914,15 +1142,13 @@ function updateGameHeader() {
   // Just update the help button to be a logout button
   const LogoutBtn = document.getElementById("logoutBtn");
   if (LogoutBtn) {
-    LogoutBtn.innerHTML = "⏻";
+    LogoutBtn.innerHTML = "LOG OUT";
     LogoutBtn.title = "Logout";
 
     // Ensure button is visible and clickable
     LogoutBtn.style.display = "flex";
     LogoutBtn.style.visibility = "visible";
     LogoutBtn.style.pointerEvents = "auto";
-    LogoutBtn.style.zIndex = "9999";
-    LogoutBtn.style.position = "fixed";
 
     // Remove any existing event listeners and add the logout handler
     LogoutBtn.removeEventListener("click", handleLogout);
@@ -983,14 +1209,8 @@ function setupGROWLABInterface() {
     });
   }
 
-  // Add click handler for GROWLAB title to navigate to selection screen
-  const growlabLink = document.getElementById("growlabLink");
-  if (growlabLink) {
-    growlabLink.addEventListener("click", () => {
-      console.log("GROWLAB title clicked - navigating to selection screen");
-      showComponent("selection");
-    });
-  }
+
+  // Header title is now non-interactive (just displays current section name)
 
   // Help button is now the logout button, handled in updateGameHeader
 
@@ -1172,6 +1392,9 @@ async function populateSeedGrid() {
           .querySelectorAll(".seed-item")
           .forEach((i) => i.classList.remove("selected"));
         item.classList.add("selected");
+        // Activate the Seed header
+        const seedHeader = document.querySelector("#seedGrid")?.closest(".gridColumn")?.querySelector(".gridHeader");
+        if (seedHeader) seedHeader.classList.add("active");
         updateBeginButton();
       });
     });
@@ -1298,6 +1521,7 @@ async function updateSeedsDisplay() {
   if (lives > 0) {
     // Update seeds count
     livesHeader.textContent = `SEEDS: ${lives.toString().padStart(2, "0")}`;
+    livesHeader.classList.remove('timer-mode');
     livesHeader.style.color = "#00cc33"; // Reset color
 
     // Show daily spin button
@@ -1319,6 +1543,7 @@ async function updateSeedsDisplay() {
     const seconds = Math.floor((timeLeft % 60000) / 1000);
 
     livesHeader.textContent = `Return in ${hours}h ${minutes}m ${seconds}s`;
+    livesHeader.classList.add('timer-mode');
     livesHeader.style.color = "#ff6b6b";
 
     // Check if user can still use daily spin (don't hide it automatically)
@@ -1498,6 +1723,9 @@ function setupSoilSelectionHandlers() {
         .querySelectorAll(".soil-item")
         .forEach((i) => i.classList.remove("selected"));
       item.classList.add("selected");
+      // Activate the Soil header
+      const soilHeader = document.querySelector("#soilGrid")?.closest(".gridColumn")?.querySelector(".gridHeader");
+      if (soilHeader) soilHeader.classList.add("active");
       updateBeginButton();
     });
   });
@@ -1511,6 +1739,9 @@ function setupDefenseSelectionHandlers() {
         .querySelectorAll(".defense-item")
         .forEach((i) => i.classList.remove("selected"));
       item.classList.add("selected");
+      // Activate the Defence header
+      const defenseHeader = document.querySelector("#defenseGrid")?.closest(".gridColumn")?.querySelector(".gridHeader");
+      if (defenseHeader) defenseHeader.classList.add("active");
       updateBeginButton();
     });
   });
@@ -1847,11 +2078,11 @@ function updateFeedingStartButton() {
 
   if (hasWater) {
     startBtn.disabled = false;
-    startBtn.textContent = "Start Growing";
+    startBtn.innerHTML = "Start Growing";
     console.log("Button enabled");
   } else {
     startBtn.disabled = true;
-    startBtn.textContent = "Set Water Schedule";
+    startBtn.textContent = "Set Schedule";
     console.log("Button disabled");
   }
 }
@@ -1975,6 +2206,9 @@ let events = [];
 
 // Seed unlock system
 let unlockedSeeds = {};
+
+// Tracks which seed types the player has successfully grown (for revealing flower images)
+let grownSeeds = {};
 const seedUnlockThresholds = [
   0, // 1st seed - always unlocked
   0, // 2nd seed - always unlocked
@@ -2077,8 +2311,7 @@ async function initializeUnlockedSeeds() {
     }
 
     console.log(
-      `Unlocked ${
-        Object.keys(unlockedSeeds).length
+      `Unlocked ${Object.keys(unlockedSeeds).length
       } seeds for total yield: ${totalYield}g`
     );
   } catch (error) {
@@ -2098,6 +2331,56 @@ function checkAndUnlockSeeds() {
   // For now, just ensure first 6 are unlocked
   // In a full implementation, this would check against total yield from PlayFab
   initializeUnlockedSeeds();
+}
+
+// Initialize grown seeds from PlayFab - tracks which seeds player has successfully harvested
+// Uses playerProgress.grownStrains from Internal Data (set by cloud script)
+async function initializeGrownSeeds() {
+  try {
+    // Get player progress from cloud script which contains grownStrains
+    const result = await new Promise((resolve, reject) => {
+      PlayFab.ClientApi.ExecuteCloudScript(
+        { FunctionName: "getPlayerProgress", FunctionParameter: {} },
+        (result, error) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+          resolve(result.data);
+        }
+      );
+    });
+
+    if (result?.FunctionResult?.success && result?.FunctionResult?.playerProgress?.grownStrains) {
+      // Convert array to object for consistent lookup
+      const grownArray = result.FunctionResult.playerProgress.grownStrains;
+      grownSeeds = {};
+      grownArray.forEach(seedKey => {
+        grownSeeds[seedKey] = true;
+      });
+      console.log(`🌸 Loaded ${grownArray.length} grown seeds from playerProgress.grownStrains`);
+    } else {
+      grownSeeds = {};
+      console.log('🌱 No grown strains found in playerProgress');
+    }
+  } catch (error) {
+    console.warn('Failed to load grown seeds from playerProgress:', error);
+    grownSeeds = {};
+  }
+}
+
+// Record a seed as successfully grown
+// Note: The actual saving happens in the cloud script's submitScore handler
+// This function just updates the local cache
+async function recordGrownSeed(seedKey) {
+  if (!seedKey || grownSeeds[seedKey]) {
+    return; // Already recorded or no seed key
+  }
+
+  grownSeeds[seedKey] = true;
+  console.log(`🌸 Recorded ${seedKey} as successfully grown (saved by cloud script)`);
+  // Note: Don't need to save here - the cloud script's submitScore handler 
+  // already adds seedType to playerProgress.grownStrains when yield is submitted
 }
 
 // ========================================
@@ -2216,6 +2499,11 @@ function resetSelectionScreen() {
   // Clear feeding schedule selections
   document.querySelectorAll(".nutrientOption").forEach((option) => {
     option.classList.remove("selected");
+  });
+
+  // Reset grid headers to inactive state
+  document.querySelectorAll(".gridHeader").forEach((header) => {
+    header.classList.remove("active");
   });
 
   // Reset water counts to 0
@@ -2355,7 +2643,7 @@ function resetUIState() {
   const startBtn = document.getElementById("startGrowingBtn");
   if (startBtn) {
     startBtn.disabled = true;
-    startBtn.textContent = "Set Water Schedule";
+    startBtn.textContent = "Set Schedule";
   }
 
   // Clear any detail views
@@ -2616,9 +2904,8 @@ function updateSelectionIcons() {
   // Update seed icon
   const seedIcon = document.getElementById("seedIcon");
   if (seedIcon && plant.seedType && seedProperties[plant.seedType]) {
-    seedIcon.innerHTML = `<img src="img/selections/${
-      seedProperties[plant.seedType].image
-    }" alt="Seed">`;
+    seedIcon.innerHTML = `<img src="img/selections/${seedProperties[plant.seedType].image
+      }" alt="Seed">`;
   }
 
   // Update soil icon
@@ -2629,9 +2916,8 @@ function updateSelectionIcons() {
       graveblend: "soil2.png",
       marrowmoss: "soil3.png",
     };
-    soilIcon.innerHTML = `<img src="img/selections/${
-      soilImages[plant.soilType]
-    }" alt="Soil">`;
+    soilIcon.innerHTML = `<img src="img/selections/${soilImages[plant.soilType]
+      }" alt="Soil">`;
   }
 
   // Update defense icon
@@ -3178,6 +3464,12 @@ async function submitScores(potency, weight) {
       console.error("Failed to submit yield score:", yieldError);
     }
 
+    // Record this seed as successfully grown (for revealing flower images in vault)
+    const seedKey = plant.seedType || window.gameSelections?.seed;
+    if (seedKey) {
+      await recordGrownSeed(seedKey);
+    }
+
     // Update local high scores
     await loadHighScores();
   } catch (error) {
@@ -3349,6 +3641,12 @@ async function showHarvestScreen() {
     await submitScores(finalPotency, finalWeight);
     plant.scoresRecorded = true;
 
+    // Record this seed as successfully grown to show flower art in vault
+    if (plant.seedType) {
+      console.log(`🌸 Recording ${plant.seedType} as successfully grown`);
+      await recordGrownSeed(plant.seedType);
+    }
+
     // Also store in a more persistent way to prevent re-submissions
     // even if plant object gets recreated
     window.gameScoresSubmitted = true;
@@ -3398,6 +3696,48 @@ function startGameSimulation() {
 
   // Initialize the game with actual data
   initializeGameSimulation();
+}
+
+// Load leaderboard data and display it
+async function loadLeaderboardData() {
+  try {
+    // Load both leaderboards
+    const [potencyData, yieldData] = await Promise.all([
+      PlayFabService.getLeaderboard("potency", 100),
+      PlayFabService.getLeaderboard("TotalYield", 100),
+    ]);
+
+    // Process and display potency leaderboard
+    displayLeaderboardSection(
+      potencyData,
+      "potencyBoard",
+      "potencyCurrentUser",
+      "%",
+      currentGrower
+    );
+
+    // Process and display yield leaderboard
+    displayLeaderboardSection(
+      yieldData,
+      "yieldBoard",
+      "yieldCurrentUser",
+      "g",
+      currentGrower
+    );
+  } catch (error) {
+    console.error("Failed to load leaderboard:", error);
+    document.getElementById("potencyBoard").innerHTML =
+      '<div class="noDataMessage">Failed to load data</div>';
+    document.getElementById("yieldBoard").innerHTML =
+      '<div class="noDataMessage">Failed to load data</div>';
+  }
+
+  // Back button
+  document
+    .getElementById("backFromLeaderboard")
+    ?.addEventListener("click", async () => {
+      showComponent("selection");
+    });
 }
 
 // Add this function to handle leaderboard button click
@@ -3574,6 +3914,7 @@ async function populateVaultSeeds() {
   if (!seedGrid) return;
 
   await initializeUnlockedSeeds();
+  await initializeGrownSeeds();
 
   let totalYield = 0;
   try {
@@ -3590,27 +3931,39 @@ async function populateVaultSeeds() {
   seedGrid.innerHTML = `
     <div class="itemGrid">
       ${allSeeds
-        .map((seedKey, index) => {
-          const seed = seedProperties[seedKey];
-          const isUnlocked = unlockedSeeds[seedKey] || false;
-          const threshold = seedUnlockThresholds[index] || 0;
+      .map((seedKey, index) => {
+        const seed = seedProperties[seedKey];
+        const isUnlocked = unlockedSeeds[seedKey] || false;
+        const isGrown = grownSeeds[seedKey] || false;
+        const threshold = seedUnlockThresholds[index] || 0;
 
-          if (isUnlocked) {
+        if (isUnlocked) {
+          if (isGrown) {
+            // Seed has been grown - show seed image revealed (no mystery overlay)
             return `
-            <div class="vaultItem unlocked" data-item-type="seed" data-item-key="${seedKey}" title="${seed.name}">
-          <img src="img/selections/${seed.image}" alt="${seed.name}">
-        </div>
-      `;
+              <div class="vaultItem unlocked grown" data-item-type="seed" data-item-key="${seedKey}" title="${seed.name}">
+                <img src="img/selections/${seed.image}" alt="${seed.name}">
+              </div>
+            `;
           } else {
+            // Seed unlocked but NOT grown yet - show seed with mystery overlay
             return `
-            <div class="vaultItem locked" title="Unlocks at ${threshold}g total yield">
-          <div class="lockedIcon">?</div>
-              <div class="unlockRequirement">${threshold}g</div>
-        </div>
-      `;
+              <div class="vaultItem unlocked mystery" data-item-type="seed" data-item-key="${seedKey}" title="${seed.name} - Grow to reveal!">
+                <img src="img/selections/${seed.image}" alt="${seed.name}">
+                <div class="mysteryOverlay">?</div>
+              </div>
+            `;
           }
-        })
-        .join("")}
+        } else {
+          return `
+            <div class="vaultItem locked" title="Unlocks at ${threshold}g total yield">
+              <div class="lockedIcon">?</div>
+              <div class="unlockRequirement">${threshold}g</div>
+            </div>
+          `;
+        }
+      })
+      .join("")}
     </div>
   `;
 
@@ -4086,43 +4439,42 @@ async function populateVaultBadges() {
     badgeGrid.innerHTML = `
       <div class="itemGrid">
         ${availableBadges
-          .map((badge) => {
-            const isUnlocked = playerProgress.badges.includes(badge.id);
-            const hasRequirement = checkBadgeRequirement(
-              badge.requirement,
-              playerProgress
-            );
-            console.log(
-              `🏆 [DEBUG] Badge ${badge.id}: unlocked=${isUnlocked}, hasRequirement=${hasRequirement}, name="${badge.name}"`
-            );
+        .map((badge) => {
+          const isUnlocked = playerProgress.badges.includes(badge.id);
+          const hasRequirement = checkBadgeRequirement(
+            badge.requirement,
+            playerProgress
+          );
+          console.log(
+            `🏆 [DEBUG] Badge ${badge.id}: unlocked=${isUnlocked}, hasRequirement=${hasRequirement}, name="${badge.name}"`
+          );
 
-            if (isUnlocked) {
-              return `
+          if (isUnlocked) {
+            return `
               <div class="vaultItem unlocked" data-item-type="badge" data-item-key="${badge.id}" title="${badge.name}">
                 <img src="img/badges/${badge.icon}" alt="${badge.name}">
                 <div class="badgeEarned">✓</div>
               </div>
             `;
-            } else if (hasRequirement) {
-              return `
+          } else if (hasRequirement) {
+            return `
               <div class="vaultItem ready" data-item-type="badge" data-item-key="${badge.id}" title="Badge ready to claim!">
                 <div class="lockedIcon">?</div>
                 <div class="badgeReady">!</div>
               </div>
             `;
-            } else {
-              return `
-              <div class="vaultItem locked" data-item-type="badge" data-item-key="${
-                badge.id
+          } else {
+            return `
+              <div class="vaultItem locked" data-item-type="badge" data-item-key="${badge.id
               }" title="${badge.name} - Requires ${getRequirementText(
                 badge.requirement
               )}">
                 <div class="lockedIcon">?</div>
               </div>
             `;
-            }
-          })
-          .join("")}
+          }
+        })
+        .join("")}
       </div>
     `;
 
@@ -4333,36 +4685,35 @@ async function populateVaultEquips() {
   equipGrid.innerHTML = `
       <div class="itemGrid">
         ${Object.entries(lightSources)
-          .map(([key, light]) => {
-            const threshold =
-              lightUnlockThresholds.find((t) => t.key === key)?.threshold || 0;
-            const isUnlocked = totalYield >= threshold || key === "candle"; // Candle always unlocked
-            const isCurrent = currentLight === key;
+      .map(([key, light]) => {
+        const threshold =
+          lightUnlockThresholds.find((t) => t.key === key)?.threshold || 0;
+        const isUnlocked = totalYield >= threshold || key === "candle"; // Candle always unlocked
+        const isCurrent = currentLight === key;
 
-            if (isUnlocked) {
-              return `
+        if (isUnlocked) {
+          return `
               <div class="vaultItem unlocked ${isCurrent ? "equipped" : ""}" 
-                   data-item-type="equip" data-item-key="${key}" title="${
-                light.name
-              }">
+                   data-item-type="equip" data-item-key="${key}" title="${light.name
+            }">
                 <img src="img/selections/light/light${getLightImageIndex(
-                  key
-                )}.png" alt="${light.name}">
+              key
+            )}.png" alt="${light.name}">
                 <div class="itemName">${light.name}</div>
                 ${isCurrent ? '<div class="equippedBadge">EQUIPPED</div>' : ""}
               </div>
             `;
-            } else {
-              return `
+        } else {
+          return `
               <div class="vaultItem locked" title="Unlocks at ${threshold}g total yield">
                 <div class="lockedIcon">?</div>
                 <div class="unlockRequirement">${threshold}g</div>
                 <div class="itemName">${light.name}</div>
               </div>
             `;
-            }
-          })
-          .join("")}
+        }
+      })
+      .join("")}
       </div>
     `;
 
@@ -4442,18 +4793,37 @@ function showSeedDetails(seedKey, detailView) {
   const seed = seedProperties[seedKey];
   if (!seed) return;
 
-  // Show the plant preview and seed details in the detail view
-  detailView.innerHTML = `
-    <div class="itemDetail">
-      <div class="detailImage">
-    <img src="img/selections/${seed.flowerImage}" alt="${seed.name} Plant">
+  // Check if this seed has been successfully grown
+  const isGrown = grownSeeds[seedKey] || false;
+
+  if (isGrown) {
+    // Show the plant/flower image - player has grown this seed
+    detailView.innerHTML = `
+      <div class="itemDetail">
+        <div class="detailImage">
+          <img src="img/selections/${seed.flowerImage || seed.image}" alt="${seed.name} Plant">
+        </div>
+        <div class="detailInfo">
+          <h3>${seed.name}</h3>
+        </div>
       </div>
-      <div class="detailInfo">
-    <h3>${seed.name}</h3>
- 
+    `;
+  } else {
+    // Seed not yet grown - show mystery overlay
+    detailView.innerHTML = `
+      <div class="itemDetail">
+        <div class="detailImage mystery">
+          <div class="mysteryPlant">
+            <div class="mysteryIcon">?</div>
+            <div class="mysteryText">Grow this seed to reveal!</div>
+          </div>
+        </div>
+        <div class="detailInfo">
+          <h3>${seed.name}</h3>
+        </div>
       </div>
-    </div>
-  `;
+    `;
+  }
 }
 
 function showBadgeDetails(
@@ -4469,37 +4839,34 @@ function showBadgeDetails(
   const hasRequirement = playerProgress?.totalGrows >= badge.requirement.value;
 
   detailView.innerHTML = `
-    <div class="itemDetail">
+    <div class="itemDetail badge-detail">
       <div class="detailImage">
-        ${
-          isUnlocked
-            ? `<img src="img/badges/${badge.icon}" alt="${badge.name}">`
-            : `<div class="lockedIcon" style="font-size: 4em; color: #666; text-align: center; line-height: 1;">?</div>`
-        }
+        ${isUnlocked
+      ? `<img src="img/badges/${badge.icon}" alt="${badge.name}">`
+      : `<div class="lockedIcon" style="font-size: 4em; color: #666; text-align: center; line-height: 1;">?</div>`
+    }
       </div>
       <div class="detailInfo">
         <h3>${badge.name}</h3>
         <p class="description">${badge.description}</p>
         <div class="badgeStatus">
-          ${
-            isUnlocked
-              ? '<div class="statusBadge earned">EARNED</div>'
-              : hasRequirement
-              ? '<div class="statusBadge ready">READY TO CLAIM</div>'
-              : `<div class="statusBadge locked">Requires ${getRequirementText(
-                  badge.requirement
-                )}</div>`
-          }
+          ${isUnlocked
+      ? '<div class="statusBadge earned">EARNED</div>'
+      : hasRequirement
+        ? '<div class="statusBadge ready">READY TO CLAIM</div>'
+        : `<div class="statusBadge locked">Requires ${getRequirementText(
+          badge.requirement
+        )}</div>`
+    }
         </div>
-        ${
-          !isUnlocked
-            ? `
+        ${!isUnlocked
+      ? `
         <div class="progressInfo">
           <span>${getProgressText(badge.requirement, playerProgress)}</span>
         </div>
         `
-            : ""
-        }
+      : ""
+    }
       </div>
     </div>
   `;
@@ -4517,8 +4884,8 @@ function showEquipDetails(equipKey, detailView) {
     <div class="itemDetail">
       <div class="detailImage">
         <img src="img/selections/light/light${getLightImageIndex(
-          equipKey
-        )}.png" alt="${equipment.name}">
+    equipKey
+  )}.png" alt="${equipment.name}">
       </div>
       <div class="detailInfo">
         <h3>${equipment.name}</h3>
@@ -4526,34 +4893,32 @@ function showEquipDetails(equipKey, detailView) {
           <div class="statRow">
             <span class="statLabel">Yield Bonus:</span>
             <span class="statValue">${(
-              (equipment.yieldBonus - 1) *
-              100
-            ).toFixed(0)}%</span>
+      (equipment.yieldBonus - 1) *
+      100
+    ).toFixed(0)}%</span>
           </div>
-          ${
-            threshold > 0
-              ? `
+          ${threshold > 0
+      ? `
           <div class="statRow">
             <span class="statLabel">Unlock Requirement:</span>
             <span class="statValue">${threshold}g total yield</span>
           </div>
           `
-              : ""
-          }
+      : ""
+    }
         </div>
-        ${
-          !isCurrent
-            ? `
+        ${!isCurrent
+      ? `
         <div class="equipActions">
           <button class="equipBtn" data-equip-key="${equipKey}">EQUIP</button>
         </div>
         `
-            : `
+      : `
         <div class="equippedStatus">
           <span class="statusBadge equipped">EQUIPPED</span>
         </div>
         `
-        }
+    }
       </div>
     </div>
   `;
@@ -4619,11 +4984,11 @@ function updateSoundUI() {
 
   if (isSoundEnabled) {
     soundToggleBtn.classList.remove("muted");
-    soundIcon.textContent = "🔊"; // Speaker with sound waves
+    soundIcon.textContent = "SFX";
     soundIcon.title = "Sound On";
   } else {
     soundToggleBtn.classList.add("muted");
-    soundIcon.textContent = "🔇"; // Muted speaker
+    soundIcon.textContent = "OFF";
     soundIcon.title = "Sound Off";
   }
 }

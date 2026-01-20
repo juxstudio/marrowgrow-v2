@@ -40,6 +40,11 @@
                 <img src="img/icons/discord.svg" alt="Discord" class="button-icon">
                 <a href="http://discord.gg/RUEJS6Hk">Discord this way</a>
             </button>
+            <!-- Dev Login Button - Only visible in development mode -->
+            <button class="authPanelButton dev-login-button" id="devLoginBtn" onclick="handleDevLogin()"
+                style="display: none; background: linear-gradient(135deg, #ff6b00, #ff8c00); border: 2px dashed #ffcc00;">
+                🔧 Dev Login (Test Account)
+            </button>
         </div>
 
         <div class="loginForm" id="loginForm" style="display: none;">
@@ -70,21 +75,36 @@
     <!-- GROWLAB Interface - outside authPanel to avoid nesting issues -->
     <div class="mainGameScreen" id="mainGameScreen" style="display: none;">
         <div class="gameHeader">
-            <button class="navButton left" id="vaultBtn">
-                <span>← Vault</span>
-            </button>
-
             <h1 class="gameTitle" id="growlabLink">GROWLAB</h1>
 
-            <button class="navButton right" id="leaderboardBtn">
-                Leaderboard <span>←</span>
-            </button>
+            <div class="headerRightGroup">
+                <button class="headerBtn" id="soundToggleBtn" title="Toggle Sound">
+                    <span class="sound-icon" id="soundIcon">SFX</span>
+                </button>
+                <button class="headerBtn logout" id="logoutBtn">
+                    LOG OUT
+                </button>
+            </div>
         </div>
 
         <div class="gameContent">
             <!-- Selection Component -->
             <div id="selection-component" class="component active">
-                <div class="selectionLayout">
+                <!-- Room Navigation Overlays -->
+                <div class="roomNavOverlay left" id="selectionNavLeft" title="Go to Vault">
+                    <span class="roomNavArrow">←<span class="roomNavLabel">Vault</span></span>
+                </div>
+                <div class="roomNavOverlay right" id="selectionNavRight" title="Go to Leaderboard">
+                    <span class="roomNavArrow">→<span class="roomNavLabel">Leaders</span></span>
+                </div>
+                <!-- Hotspot Overlay - Click to reveal modal -->
+                <div class="hotspotOverlay" id="selectionHotspot" title="Click to open Grow Set selection">
+                    <div class="hotspotHint">Click the Tank</div>
+                </div>
+
+                <!-- selectionLayout with modalPanel class for scaling -->
+                <div class="selectionLayout modalPanel" id="selectionModal">
+                    <button class="minimizeBtn" id="minimizeSelectionBtn" title="Minimize">−</button>
                     <!-- Left side - Instructions -->
                     <div class="instructionPanel">
                         <h2 class="selectionTitle">SELECT YOUR GROW SET</h2>
@@ -97,12 +117,12 @@
                             <!-- Seeds Available Section -->
                             <div class="seedsAvailableSection" id="seedsAvailableSection">
                                 <div class="livesDisplay" id="livesDisplay">
-                                    <div class="livesHeader" id="livesHeader">SEEDS: 00</div>
+                                    <div class="livesHeader" id="livesHeader">SEEDS:00</div>
                                     <button id="dailySpinBtn" class="dailySpinBtn">Daily Spin</button>
                                 </div>
                             </div>
 
-                            <button id="beginRitualBtn" class="beginRitualBtn" disabled>Begin Ritual</button>
+                            <button id="beginRitualBtn" class="beginRitualBtn" disabled>Select grow kit</button>
                         </div>
                     </div>
 
@@ -128,24 +148,24 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
 
-            <!-- Feeding Schedule Component -->
             <div id="feeding-component" class="component">
                 <div class="feedingLayout">
-                    <!-- Instructions Panel (smaller) -->
+                    <!-- Back arrow at top left corner of the blur container -->
+                    <button class="feedingBackArrow" id="backToSelectionBtn">←</button>
+                    <!-- Instructions Panel -->
                     <div class="feedingInstructionPanel">
                         <h2 class="selectionTitle">Feeding Schedule</h2>
                         <p class="selectionSubtext">
-                            Set water times and nutrients<br>
-                            for each growth stage
+                            Set water times and nutrients for each growth stage
                         </p>
-                        <button class="beginRitualBtn" id="startGrowingBtn" disabled>Start Growing</button>
-                        <button class="beginRitualBtn secondary" id="randomFeedsBtn">Randomizer</button>
-                        <button class="beginRitualBtn secondary" id="backToSelectionBtn">Back to Seeds</button>
+                        <div class="feedingButtonsContainer">
+                            <button class="beginRitualBtn secondary" id="randomFeedsBtn">Randomizer</button>
+                            <button class="beginRitualBtn" id="startGrowingBtn" disabled>Set Schedule</button>
+                        </div>
                     </div>
 
                     <!-- Feeding Grids -->
@@ -225,31 +245,31 @@
                         <!-- Resource bars -->
                         <div class="resourceBars">
                             <div class="resourceRow">
-                                <span class="resourceLabel">Growth</span>
+                                <span class="resourceLabel green">Growth</span>
                                 <div class="resourceBarContainer">
                                     <div class="resourceBarFill green" id="growthBar" style="width: 45%"></div>
                                 </div>
                             </div>
                             <div class="resourceRow">
-                                <span class="resourceLabel">Water</span>
+                                <span class="resourceLabel blue">Water</span>
                                 <div class="resourceBarContainer">
                                     <div class="resourceBarFill blue" id="waterBar" style="width: 95%"></div>
                                 </div>
                             </div>
                             <div class="resourceRow">
-                                <span class="resourceLabel">Light</span>
+                                <span class="resourceLabel yellow">Light</span>
                                 <div class="resourceBarContainer">
                                     <div class="resourceBarFill yellow" id="lightBar" style="width: 100%"></div>
                                 </div>
                             </div>
                             <div class="resourceRow">
-                                <span class="resourceLabel">Nutes</span>
+                                <span class="resourceLabel purple">Nutes</span>
                                 <div class="resourceBarContainer">
                                     <div class="resourceBarFill purple" id="nutrientBar" style="width: 100%"></div>
                                 </div>
                             </div>
                             <div class="resourceRow">
-                                <span class="resourceLabel">Stress</span>
+                                <span class="resourceLabel red">Stress</span>
                                 <div class="resourceBarContainer">
                                     <div class="resourceBarFill red" id="stressBar" style="width: 35%"></div>
                                 </div>
@@ -330,10 +350,11 @@
 
                         <div class="harvestActions">
                             <button class="beginRitualBtn" id="newGameHarvestBtn">New Game</button>
-                            <button class="beginRitualBtn secondary" id="lookForSeedsBtn">Look for Seeds</button>
-                            <button class="beginRitualBtn secondary" id="copyImageBtn">Copy Image</button>
-                            <div id="lookForSeedsMsg"
-                                style="color:#ffd700;font-family:'Press Start 2P',monospace;margin-top:10px;"></div>
+                            <button class="beginRitualBtn secondary" id="lookForSeedsBtn">Harvest</button>
+                            <button class="beginRitualBtn secondary" id="copyImageBtn">Copy</button>
+                        </div>
+                        <div id="lookForSeedsMsg"
+                            style="color:#ffd700;font-family:'Press Start 2P',monospace;margin-top:15px;text-align:center;font-size:0.8em;">
                         </div>
                     </div>
                 </div>
@@ -341,102 +362,120 @@
 
             <!-- Vault Component (TABS OUTSIDE CONTAINER) -->
             <div id="vault-component" class="component">
-                <!-- Tab Navigation - Outside Container -->
-                <div class="vaultTabs">
-                    <button class="vaultTab active" data-tab="seeds">SEEDS</button>
-                    <button class="vaultTab" data-tab="badges">BADGES</button>
-                    <button class="vaultTab" data-tab="equips">EQUIPS</button>
+                <!-- Room Navigation Overlays -->
+                <div class="roomNavOverlay right" id="vaultNavRight" title="Go to Grow Lab">
+                    <span class="roomNavArrow">→<span class="roomNavLabel">Grow Lab</span></span>
+                </div>
+                <!-- Hotspot Overlay - Click to reveal modal -->
+                <div class="hotspotOverlay" id="vaultHotspot" title="Click to open Vault">
+                    <div class="hotspotHint">Click the Door</div>
                 </div>
 
-                <!-- Main Content Area - Full Container Space -->
-                <div class="vaultContent">
-                    <!-- Left side - Grid/Collection -->
-                    <div class="vaultGrid">
-                        <div class="vaultGridContainer">
-                            <!-- Seeds Tab Content -->
-                            <div class="tabContent active" id="seedsContent">
-                                <div class="gridScroll" id="vaultSeedGrid">
-                                    <!-- Seeds will populate here -->
+                <!-- Vault wrapper with modalPanel class for scaling -->
+                <div class="vaultWrapper modalPanel" id="vaultModal">
+                    <button class="minimizeBtn" id="minimizeVaultBtn" title="Minimize">−</button>
+
+                    <!-- Tab Navigation removed from here - now inside vaultGrid -->
+
+                    <!-- Main Content Area -->
+                    <div class="vaultContent">
+                        <!-- Left side - Grid/Collection with tabs above -->
+                        <div class="vaultGrid">
+                            <!-- Tabs positioned above grid only -->
+                            <div class="vaultTabs">
+                                <button class="vaultTab active" data-tab="seeds">SEEDS</button>
+                                <button class="vaultTab" data-tab="badges">BADGES</button>
+                                <button class="vaultTab" data-tab="equips">EQUIPS</button>
+                            </div>
+                            <div class="vaultGridContainer">
+                                <!-- Seeds Tab Content -->
+                                <div class="tabContent active" id="seedsContent">
+                                    <div class="gridScroll" id="vaultSeedGrid">
+                                        <!-- Seeds will populate here -->
+                                    </div>
+                                </div>
+
+                                <!-- Badges Tab Content -->
+                                <div class="tabContent" id="badgesContent">
+                                    <div class="gridScroll" id="vaultBadgeGrid">
+                                        <!-- Badges will populate here -->
+                                    </div>
+                                </div>
+
+                                <!-- Equips Tab Content -->
+                                <div class="tabContent" id="equipsContent">
+                                    <div class="gridScroll" id="vaultEquipGrid">
+                                        <!-- Equipment will populate here -->
+                                    </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Badges Tab Content -->
-                            <div class="tabContent" id="badgesContent">
-                                <div class="gridScroll" id="vaultBadgeGrid">
-                                    <!-- Badges will populate here -->
-                                </div>
-                            </div>
-
-                            <!-- Equips Tab Content -->
-                            <div class="tabContent" id="equipsContent">
-                                <div class="gridScroll" id="vaultEquipGrid">
-                                    <!-- Equipment will populate here -->
+                        <!-- Right side - Detail View -->
+                        <div class="vaultDetail">
+                            <div class="detailView" id="detailView">
+                                <div class="emptyDetail">
+                                    <p>Select an item to view details</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right side - Detail View -->
-                    <div class="vaultDetail">
-                        <div class="detailView" id="detailView">
-                            <div class="emptyDetail">
-                                <p>Select an item to view details</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </div> <!-- Close vaultContent -->
+            </div> <!-- Close modalPanel -->
+        </div> <!-- Close vault-component -->
 
+        <!-- Leaderboard Component -->
+        <div id="leaderboard-component" class="component">
+            <!-- Room Navigation Overlays -->
+            <div class="roomNavOverlay left" id="leaderboardNavLeft" title="Go to Grow Lab">
+                <span class="roomNavArrow">←<span class="roomNavLabel">Grow Lab</span></span>
+            </div>
+            <!-- Hotspot Overlay - Click to reveal modal -->
+            <div class="hotspotOverlay" id="leaderboardHotspot" title="Click to view Leaderboard">
+                <div class="hotspotHint">Click the Screen</div>
             </div>
 
-            <!-- Leaderboard Component -->
-            <div id="leaderboard-component" class="component">
-                <div class="leaderboardLayout">
-                    <h2 class="selectionTitle">Global Leaderboard</h2>
+            <!-- leaderboardLayout with modalPanel class for scaling -->
+            <div class="leaderboardLayout modalPanel" id="leaderboardModal">
+                <button class="minimizeBtn" id="minimizeLeaderboardBtn" title="Minimize">−</button>
+                <h2 class="selectionTitle">Global Leaderboard</h2>
 
-                    <div class="leaderboardContent">
-                        <!-- Potency Section -->
-                        <div class="leaderboardSection">
-                            <h3 class="leaderboardTitle">Potency</h3>
-                            <div class="leaderboardContainer">
-                                <div id="potencyCurrentUser" class="currentUserSection" style="display: none;">
-                                    <!-- Current user entry will go here -->
-                                </div>
-                                <div class="leaderboardScroll" id="potencyBoard">
-                                    <div class="noDataMessage">Loading...</div>
-                                </div>
+                <div class="leaderboardContent">
+                    <!-- Potency Section -->
+                    <div class="leaderboardSection">
+                        <h3 class="leaderboardTitle">Potency</h3>
+                        <div class="leaderboardContainer">
+                            <div id="potencyCurrentUser" class="currentUserSection" style="display: none;">
+                                <!-- Current user entry will go here -->
                             </div>
-                        </div>
-
-                        <!-- Yield Section -->
-                        <div class="leaderboardSection">
-                            <h3 class="leaderboardTitle">Yield</h3>
-                            <div class="leaderboardContainer">
-                                <div id="yieldCurrentUser" class="currentUserSection" style="display: none;">
-                                    <!-- Current user entry will go here -->
-                                </div>
-                                <div class="leaderboardScroll" id="yieldBoard">
-                                    <div class="noDataMessage">Loading...</div>
-                                </div>
+                            <div class="leaderboardScroll" id="potencyBoard">
+                                <div class="noDataMessage">Loading...</div>
                             </div>
                         </div>
                     </div>
 
-                    <button class="beginRitualBtn secondary" id="backFromLeaderboard">Back to Game</button>
+                    <!-- Yield Section -->
+                    <div class="leaderboardSection">
+                        <h3 class="leaderboardTitle">Yield</h3>
+                        <div class="leaderboardContainer">
+                            <div id="yieldCurrentUser" class="currentUserSection" style="display: none;">
+                                <!-- Current user entry will go here -->
+                            </div>
+                            <div class="leaderboardScroll" id="yieldBoard">
+                                <div class="noDataMessage">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <button class="helpButton" id="logoutBtn">
-            ⏻ <!-- Power Symbol -->
-        </button>
+            </div> <!-- Close leaderboardLayout modalPanel -->
+        </div> <!-- Close leaderboard-component -->
+    </div> <!-- Close gameContent -->
 
     </div>
 
-    <!-- Sound Toggle Button - Global, visible on all screens -->
-    <button class="soundButton" id="soundToggleBtn" title="Toggle Sound">
-        <span class="sound-icon" id="soundIcon">🔊</span>
-    </button>
-
+    <script src="config.env.js"></script>
     <script src="config.js"></script>
     <script src="storage.js"></script>
     <script src="view.js"></script>
