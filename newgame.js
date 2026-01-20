@@ -810,6 +810,23 @@ async function handleLogin(event) {
         document.querySelector(".authPanel").style.display = "none";
         document.getElementById("mainGameScreen").style.display = "flex";
 
+        // Initialize hotspot UI first (critical for game interaction)
+        initializeHotspotUI();
+
+        // Setup the GROWLAB interface
+        setupGROWLABInterface();
+
+        // Update header with logout button
+        updateGameHeader();
+
+        // Start background music if enabled
+        if (isSoundEnabled) {
+          playGameSound();
+        }
+
+        // Set initial background
+        changeBackgroundForComponent("selection");
+
         await renderSeedSelectionInterface();
       })
       .catch((error) => {
