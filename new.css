@@ -17,12 +17,24 @@ body::before {
 }
 
 body {
+  background-color: #000;
   background-image: url("/img/selections/bg.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   height: 100vh;
   width: 100vw;
+  animation: fadeInBackground 0.4s ease-out forwards;
+}
+
+@keyframes fadeInBackground {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .loadingScreen {
