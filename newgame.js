@@ -181,8 +181,32 @@ async function equipLight(lightKey) {
 window.equipLight = equipLight;
 
 // SPA Component Manager
-function showComponent(componentName) {
+// Room transition helpers
+function showRoomTransition() {
+  const overlay = document.getElementById('roomTransitionOverlay');
+  if (overlay) {
+    overlay.classList.add('active');
+  }
+}
+
+function hideRoomTransition() {
+  const overlay = document.getElementById('roomTransitionOverlay');
+  if (overlay) {
+    overlay.classList.remove('active');
+  }
+}
+
+async function showComponent(componentName) {
   console.log(`🔄 [DEBUG] Showing component: ${componentName}`);
+
+  // Determine if we need a loading transition (for data-heavy components)
+  const needsTransition = componentName === 'vault' || componentName === 'leaderboard';
+
+  if (needsTransition) {
+    showRoomTransition();
+    // Small delay to let overlay fade in
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
 
   // Reset state when returning to selection screen
   if (componentName === "selection") {
@@ -240,6 +264,13 @@ function showComponent(componentName) {
 
   // Always refresh lives UI when switching components
   refreshLivesUI();
+
+  // Hide transition after component is ready
+  if (needsTransition) {
+    // Small delay to ensure content is rendered
+    await new Promise(resolve => setTimeout(resolve, 150));
+    hideRoomTransition();
+  }
 }
 
 // Update header title based on active component
