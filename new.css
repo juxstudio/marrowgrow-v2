@@ -624,6 +624,7 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 10px;
 }
 
 /* Fixed width only for seed and feeding selection screens */
@@ -788,6 +789,43 @@ body::after {
   margin: 0;
 }
 
+/* Daily Spin Button */
+.dailySpinBtn {
+  background: linear-gradient(135deg, #ff00ff, #cc00cc);
+  border: 2px solid #ff00ff;
+  color: #ffffff;
+  padding: 0 25px;
+  height: 48px;
+  width: 250px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7em;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+  margin-bottom: 10px;
+}
+
+.dailySpinBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+}
+
+.dailySpinBtn.used {
+  background: #333333 !important;
+  border: 2px solid #666666 !important;
+  color: #000000 !important;
+  cursor: not-allowed;
+  box-shadow: none !important;
+  text-shadow: none;
+}
+
+.dailySpinBtn.used:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 /* Feeding Component Container */
 #feeding-component {
   position: relative;
@@ -904,6 +942,159 @@ body::after {
   font-weight: bold;
 }
 
+/* Jug size controls (replaces +/- water controls) */
+.jugControls {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+/* Jug display area - shows selected bottle */
+.jugDisplay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-top: 15px;
+}
+
+.jugBottle {
+  width: 50px;
+  height: 65px;
+  background: linear-gradient(180deg, rgba(100, 100, 100, 0.8) 0%, rgba(60, 60, 60, 0.9) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px 6px 10px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Bottle neck/spout */
+.jugBottle::before {
+  content: '';
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 16px;
+  background: inherit;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+}
+
+/* Bottle cap */
+.jugBottle::after {
+  content: '';
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 8px;
+  background: rgba(40, 40, 40, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 3px 3px 0 0;
+}
+
+/* Handle on the side */
+.jugBottle .jugHandle {
+  position: absolute;
+  right: -12px;
+  top: 15px;
+  width: 10px;
+  height: 30px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  background: transparent;
+}
+
+.jugLabel {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.6em;
+  color: white;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+}
+
+/* Jug size color variations */
+.jugBottle.s {
+  background: linear-gradient(180deg, #4a9eff 0%, #2d7ed8 100%);
+  border-color: #4a9eff;
+  box-shadow: 0 0 15px rgba(74, 158, 255, 0.5);
+}
+
+.jugBottle.s::before {
+  background: linear-gradient(180deg, #4a9eff 0%, #3388e8 100%);
+  border-color: #4a9eff;
+}
+
+.jugBottle.s .jugHandle {
+  border-color: #4a9eff;
+}
+
+.jugBottle.m {
+  background: linear-gradient(180deg, #00cc66 0%, #00994d 100%);
+  border-color: #00cc66;
+  box-shadow: 0 0 15px rgba(0, 204, 102, 0.5);
+}
+
+.jugBottle.m::before {
+  background: linear-gradient(180deg, #00cc66 0%, #00aa55 100%);
+  border-color: #00cc66;
+}
+
+.jugBottle.m .jugHandle {
+  border-color: #00cc66;
+}
+
+.jugBottle.l {
+  background: linear-gradient(180deg, #ff9933 0%, #cc7a29 100%);
+  border-color: #ff9933;
+  box-shadow: 0 0 15px rgba(255, 153, 51, 0.5);
+}
+
+.jugBottle.l::before {
+  background: linear-gradient(180deg, #ff9933 0%, #dd8833 100%);
+  border-color: #ff9933;
+}
+
+.jugBottle.l .jugHandle {
+  border-color: #ff9933;
+}
+
+.jugBtn {
+  width: 32px;
+  height: 32px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.45em;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.jugBtn:hover {
+  border-color: #bfcfff;
+  background: rgba(191, 207, 255, 0.2);
+}
+
+.jugBtn.selected {
+  border-color: #00ff41;
+  background: rgba(0, 255, 65, 0.3);
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.4);
+  color: #00ff41;
+}
+
 .nutrientSelector {
   display: flex;
   flex-direction: column;
@@ -967,9 +1158,10 @@ body::after {
 
 .nutrientName {
   font-family: "Press Start 2P", monospace;
-  font-size: 0.6em;
+  font-size: 0.45em;
   color: white;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .userControls {
@@ -2589,7 +2781,7 @@ body::after {
   background-position: 100% 0%;
   border: 2px solid #e066ff;
   color: #000;
-  padding: 0 30px;
+  padding: 0 20px;
   height: 48px;
   margin-top: 8px;
   border-radius: 24px;
@@ -2600,9 +2792,109 @@ body::after {
   box-shadow: 0 4px 8px rgba(186, 143, 255, 0.3);
   width: 250px;
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   white-space: nowrap;
+  overflow: hidden;
+}
+
+.spinText {
+  transition: opacity 0.3s ease;
+}
+
+.inlineSlots {
+  display: none;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  font-size: 1.4em;
+  flex-shrink: 0;
+}
+
+/* Spin result indicator */
+.spinResult {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.9em;
+  margin-left: 8px;
+  flex-shrink: 0;
+  visibility: hidden;
+}
+
+.spinResult.win {
+  visibility: visible;
+  color: #00ff41;
+  text-shadow: 0 0 8px #00ff41;
+}
+
+.spinResult.loss {
+  visibility: visible;
+  color: #ff6b6b;
+  font-size: 0.9em;
+}
+
+.spinResult.done {
+  visibility: visible;
+  color: #666;
+}
+
+.dailySpinBtn.spinning .spinText {
+  display: none;
+}
+
+.dailySpinBtn.spinning .inlineSlots {
+  display: flex;
+}
+
+.inlineSlot {
+  display: inline-block;
+  transition: transform 0.1s ease;
+}
+
+/* Spinning animation for inline slots */
+.inlineSlot.spinning {
+  animation: inlineSlotSpin 0.1s linear infinite;
+}
+
+@keyframes inlineSlotSpin {
+  0% {
+    transform: translateY(0);
+  }
+
+  25% {
+    transform: translateY(-3px);
+  }
+
+  50% {
+    transform: translateY(0);
+  }
+
+  75% {
+    transform: translateY(3px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Winner bounce effect */
+.inlineSlot.winner {
+  animation: inlineWinBounce 0.3s ease-in-out 3;
+}
+
+@keyframes inlineWinBounce {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.3);
+  }
 }
 
 .dailySpinBtn:hover {
@@ -2622,10 +2914,66 @@ body::after {
   opacity: 0.7;
 }
 
+.dailySpinBtn.used .spinText {
+  display: none;
+}
+
+.dailySpinBtn.used .inlineSlots {
+  display: flex;
+}
+
 .dailySpinBtn.used:hover {
   background: linear-gradient(45deg, #7f8c8d, #95a5a6);
   transform: none;
   box-shadow: 0 4px 8px rgba(127, 140, 141, 0.3);
+}
+
+/* Winner state - show green when won seeds */
+.dailySpinBtn.won {
+  background: linear-gradient(45deg, #00cc33, #00ff41);
+  border: 2px solid #00ff41;
+  opacity: 1;
+}
+
+.dailySpinBtn.won .spinText {
+  display: none;
+}
+
+.dailySpinBtn.won .inlineSlots {
+  display: flex;
+}
+
+.dailySpinBtn.won:hover {
+  background: linear-gradient(45deg, #00cc33, #00ff41);
+}
+
+/* Shake animation for clicking used button */
+.dailySpinBtn.shake {
+  animation: buttonShake 0.5s ease-in-out;
+}
+
+@keyframes buttonShake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-5px);
+  }
+
+  40% {
+    transform: translateX(5px);
+  }
+
+  60% {
+    transform: translateX(-5px);
+  }
+
+  80% {
+    transform: translateX(5px);
+  }
 }
 
 /* Slots Modal */
@@ -2669,27 +3017,83 @@ body::after {
 .slotsContainer {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 15px;
   margin: 20px 0;
 }
 
-.slot {
-  width: 60px;
-  height: 60px;
-  background: rgba(0, 0, 0, 0.8);
+/* Slot reel - the visible window */
+.slotReel {
+  width: 70px;
+  height: 70px;
+  background: rgba(0, 0, 0, 0.9);
   border: 3px solid #ffffff;
   border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3),
+    inset 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+/* The strip that scrolls vertically */
+.slotStrip {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transition: transform 0.1s linear;
+}
+
+/* Individual icon in the strip */
+.slotIcon {
+  width: 70px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2em;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3), 0 4px 8px rgba(0, 0, 0, 0.5);
-  transition: all 0.3s ease;
+  font-size: 2.2em;
+  flex-shrink: 0;
 }
 
-.slot:hover {
+/* Spinning animation */
+.slotStrip.spinning {
+  animation: slotSpin 0.15s linear infinite;
+}
+
+@keyframes slotSpin {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-280px);
+  }
+}
+
+/* Stopping animation with easing */
+.slotStrip.stopping {
+  transition: transform 0.8s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+}
+
+/* Winner glow effect */
+.slotReel.winner {
   border-color: #00ff41;
-  box-shadow: 0 0 20px rgba(0, 255, 65, 0.4), 0 4px 8px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 30px rgba(0, 255, 65, 0.7),
+    inset 0 0 20px rgba(0, 255, 65, 0.2);
+  animation: winnerPulse 0.5s ease-in-out 3;
+}
+
+@keyframes winnerPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 #slotsResultMsg {
@@ -4427,4 +4831,160 @@ body::after {
   height: 100%;
   object-fit: cover;
   border-radius: 8px;
+}
+
+/* Compact Daily Spin Slot Machine */
+.compactSlots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.compactSlots.spinning {
+  pointer-events: none;
+}
+
+.compactSlotsRow {
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #666666;
+  border-radius: 24px;
+  padding: 0 20px;
+  height: 48px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  transition: all 0.3s ease;
+  width: 250px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.compactSlots.used .compactSlotsRow {
+  opacity: 0.5;
+  border-color: #666;
+  box-shadow: none;
+}
+
+.compactSlot {
+  font-size: 1.2em;
+  width: 55px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.compactSlot.spinning {
+  animation: slotSpinDown 0.15s linear infinite;
+  filter: blur(1px);
+}
+
+.compactSlot.spinning:nth-child(2) {
+  animation: slotSpinUp 0.12s linear infinite;
+}
+
+.compactSlot.spinning:nth-child(3) {
+  animation: slotSpinDown 0.18s linear infinite;
+}
+
+.compactSlot.stopping {
+  animation: slotStop 0.3s cubic-bezier(0.17, 0.67, 0.21, 1.2) forwards;
+  filter: blur(0);
+}
+
+.compactSlot.winner {
+  text-shadow: 0 0 15px rgba(0, 255, 65, 0.8);
+  animation: winnerPulse 0.5s ease-in-out 2;
+}
+
+@keyframes slotSpinDown {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slotSpinUp {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slotStop {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0.5;
+  }
+
+  60% {
+    transform: translateY(5px);
+  }
+
+  80% {
+    transform: translateY(-2px);
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes winnerPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+.compactSlotsResult {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.9em;
+  min-height: 1.2em;
+  text-align: center;
+}
+
+.compactSlotsResult.win {
+  color: #00ff41;
+  text-shadow: 0 0 10px #00ff41;
+}
+
+.compactSlotsResult.loss {
+  color: #888;
 }

@@ -1495,7 +1495,6 @@ function populateDefenseGrid() {
 // Comprehensive lives display update function
 function updateLivesDisplay() {
   const livesHeader = document.getElementById("livesHeader");
-  const dailySpinBtn = document.getElementById("dailySpinBtn");
   const beginBtn = document.getElementById("beginRitualBtn");
   const startBtn = document.getElementById("startGrowingBtn");
 
@@ -1508,11 +1507,6 @@ function updateLivesDisplay() {
     // Update seeds count
     livesHeader.textContent = `SEEDS: ${lives.toString().padStart(2, "0")}`;
     livesHeader.style.color = "#00cc33";
-
-    // Show daily spin button if available
-    if (dailySpinBtn) {
-      dailySpinBtn.style.display = "block";
-    }
 
     // Update all buttons that depend on lives
     updateBeginButton();
@@ -1538,11 +1532,6 @@ function updateLivesDisplay() {
       startBtn.textContent = "No Seeds Available";
     }
   }
-
-  // Update daily spin button state
-  if (typeof updateDailySpinButtonState === "function") {
-    updateDailySpinButtonState();
-  }
 }
 
 // Update seeds display - now just updates content instead of creating elements
@@ -1550,10 +1539,9 @@ async function updateSeedsDisplay() {
   console.log("🔍 [DEBUG] updateSeedsDisplay() called");
 
   const livesHeader = document.getElementById("livesHeader");
-  const dailySpinBtn = document.getElementById("dailySpinBtn");
   const beginBtn = document.getElementById("beginRitualBtn");
 
-  if (!livesHeader || !dailySpinBtn) {
+  if (!livesHeader) {
     console.log("🔍 [DEBUG] Seeds display elements not found");
     return;
   }
@@ -1570,9 +1558,6 @@ async function updateSeedsDisplay() {
     livesHeader.textContent = `SEEDS: ${lives.toString().padStart(2, "0")}`;
     livesHeader.classList.remove('timer-mode');
     livesHeader.style.color = "#00cc33"; // Reset color
-
-    // Show daily spin button
-    dailySpinBtn.style.display = "block";
 
     // Update begin button state (will check if all items are selected)
     updateBeginButton();
@@ -1592,22 +1577,6 @@ async function updateSeedsDisplay() {
     livesHeader.textContent = `Return in ${hours}h ${minutes}m ${seconds}s`;
     livesHeader.classList.add('timer-mode');
     livesHeader.style.color = "#ff6b6b";
-
-    // Check if user can still use daily spin (don't hide it automatically)
-    const canSpin = await canSpinSlotsToday();
-    if (canSpin) {
-      // Show daily spin button if user hasn't used it today
-      dailySpinBtn.style.display = "block";
-      console.log(
-        "🔍 [DEBUG] Showing daily spin button - user hasn't used it today"
-      );
-    } else {
-      // Hide daily spin button only if user has already used it
-      dailySpinBtn.style.display = "none";
-      console.log(
-        "🔍 [DEBUG] Hiding daily spin button - user already used it today"
-      );
-    }
 
     // Disable begin button
     if (beginBtn) {
@@ -1643,22 +1612,13 @@ async function updateSeedsDisplay() {
               .padStart(2, "0")}`;
             livesHeader.style.color = "#ffffff";
 
-            // Check if user can still use daily spin
-            const canSpin = await canSpinSlotsToday();
-            if (canSpin) {
-              dailySpinBtn.style.display = "block";
-              console.log(
-                "🔍 [DEBUG] Timer: Showing daily spin button - user hasn't used it today"
-              );
-            } else {
-              dailySpinBtn.style.display = "none";
-              console.log(
-                "🔍 [DEBUG] Timer: Hiding daily spin button - user already used it today"
-              );
-            }
-
             // Update begin button state (will check if all items are selected)
             updateBeginButton();
+
+            // Update compact slots state
+            if (typeof updateCompactSlotsState === "function") {
+              updateCompactSlotsState();
+            }
 
             // Clear the timer
             clearInterval(window.seedTimer);
@@ -1669,8 +1629,10 @@ async function updateSeedsDisplay() {
     }, 1000);
   }
 
-  // Update daily spin button state
-  updateDailySpinButtonState();
+  // Update compact slots state
+  if (typeof updateCompactSlotsState === "function") {
+    updateCompactSlotsState();
+  }
   console.log("🔍 [DEBUG] Seeds display update completed");
 }
 
@@ -1929,16 +1891,29 @@ function syncFeedingUI() {
   });
 }
 
+// Store the randomly selected nutrients for each stage
+let availableNutrientsByStage = {};
+
 function populateNutrientSelectors() {
   const stages = ["sprout", "vegetative", "flowering"];
   const nutrientKeys = Object.keys(nutrientMixes);
+
+  // Each stage gets its own random selection of 3 nutrients
+  availableNutrientsByStage = {};
 
   stages.forEach((stage) => {
     const selector = document.getElementById(`${stage}Nutrients`);
     if (!selector) return;
 
-    // Show all nutrient mixes, not just first 3
-    selector.innerHTML = nutrientKeys
+    // Shuffle and pick 3 unique nutrients for THIS stage
+    const shuffled = [...nutrientKeys].sort(() => Math.random() - 0.5);
+    const stageNutrients = shuffled.slice(0, 3);
+    availableNutrientsByStage[stage] = stageNutrients;
+
+    console.log(`🧪 ${stage} nutrients:`, stageNutrients.map(k => nutrientMixes[k].name));
+
+    // Show only the 3 randomly selected nutrients for this stage
+    selector.innerHTML = stageNutrients
       .map(
         (key) => `
           <div class="nutrientOption" 
@@ -1950,40 +1925,65 @@ function populateNutrientSelectors() {
       )
       .join("");
 
-    // Check if there's overflow and add fade effect
-    setTimeout(() => {
-      if (selector.scrollHeight > selector.clientHeight) {
-        selector.classList.add("has-overflow");
-      } else {
-        selector.classList.remove("has-overflow");
-      }
-    }, 100);
+    // Remove overflow class since we have fewer items now
+    selector.classList.remove("has-overflow");
   });
 }
+// Jug size ranges for water amounts
+const jugSizes = {
+  s: { min: 0, max: 4 },
+  m: { min: 5, max: 8 },
+  l: { min: 9, max: 12 }
+};
+
 function setupWaterControls() {
-  document.querySelectorAll(".waterBtn").forEach((btn) => {
+  document.querySelectorAll(".jugBtn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const stage = btn.dataset.stage;
-      const type = btn.classList.contains("plus") ? "plus" : "minus";
+      const size = btn.dataset.size;
+      const range = jugSizes[size];
 
-      if (type === "plus") {
-        plant.feedingSchedule[stage].waterTimes = Math.min(
-          12,
-          plant.feedingSchedule[stage].waterTimes + 1
-        );
-      } else {
-        plant.feedingSchedule[stage].waterTimes = Math.max(
-          0,
-          plant.feedingSchedule[stage].waterTimes - 1
-        );
-      }
+      // Random water amount within the jug size range
+      const waterAmount = Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
 
-      document.getElementById(`${stage}Water`).textContent =
-        plant.feedingSchedule[stage].waterTimes;
+      plant.feedingSchedule[stage].waterTimes = waterAmount;
+      plant.feedingSchedule[stage].jugSize = size; // Store selected jug size
+
+      // Update selected state - remove from siblings, add to this one
+      document.querySelectorAll(`.jugBtn[data-stage="${stage}"]`)
+        .forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+
+      // Update jug display
+      updateJugDisplay(stage, size);
+
+      console.log(`💧 ${stage}: ${size.toUpperCase()} jug = ${waterAmount} waterings`);
+
       updateFeedingStartButton();
     });
   });
 }
+
+// Update the jug bottle display for a stage
+function updateJugDisplay(stage, size) {
+  const jugDisplay = document.getElementById(`${stage}JugDisplay`);
+  if (!jugDisplay) return;
+
+  const bottle = jugDisplay.querySelector('.jugBottle');
+  const label = jugDisplay.querySelector('.jugLabel');
+
+  if (bottle) {
+    // Remove all size classes
+    bottle.classList.remove('s', 'm', 'l');
+    // Add the new size class
+    bottle.classList.add(size);
+  }
+
+  if (label) {
+    label.textContent = size.toUpperCase();
+  }
+}
+
 
 function setupNutrientControls() {
   document.querySelectorAll(".nutrientOption").forEach((option) => {
@@ -2022,12 +2022,25 @@ function setupFeedingButtons() {
     );
 
     const stages = ["sprout", "vegetative", "flowering"];
+    const jugSizeOptions = ["s", "m", "l"];
 
     stages.forEach((stage) => {
-      // Random water times
-      plant.feedingSchedule[stage].waterTimes = Math.floor(Math.random() * 13);
-      document.getElementById(`${stage}Water`).textContent =
-        plant.feedingSchedule[stage].waterTimes;
+      // Random jug size
+      const randomJugSize = jugSizeOptions[Math.floor(Math.random() * jugSizeOptions.length)];
+      const range = jugSizes[randomJugSize];
+      const waterAmount = Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
+
+      plant.feedingSchedule[stage].waterTimes = waterAmount;
+      plant.feedingSchedule[stage].jugSize = randomJugSize;
+
+      // Update jug button UI
+      document.querySelectorAll(`.jugBtn[data-stage="${stage}"]`)
+        .forEach(b => b.classList.remove("selected"));
+      const selectedJug = document.querySelector(`.jugBtn[data-stage="${stage}"][data-size="${randomJugSize}"]`);
+      if (selectedJug) selectedJug.classList.add("selected");
+
+      // Update jug display
+      updateJugDisplay(stage, randomJugSize);
 
       // Random nutrient mix from available options
       const availableOptions = document.querySelectorAll(

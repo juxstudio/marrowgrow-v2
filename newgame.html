@@ -137,6 +137,16 @@
                             </div>
 
                             <button id="beginRitualBtn" class="beginRitualBtn" disabled>Select grow kit</button>
+
+                            <!-- Compact Daily Spin - always visible -->
+                            <div class="compactSlots" id="compactSlots">
+                                <div class="compactSlotsRow" id="compactSlotsRow">
+                                    <span class="compactSlot" id="slot1">?</span>
+                                    <span class="compactSlot" id="slot2">?</span>
+                                    <span class="compactSlot" id="slot3">?</span>
+                                </div>
+                                <div class="compactSlotsResult" id="compactSlotsResult"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -188,10 +198,16 @@
                             <!-- Sprout Stage -->
                             <div class="stageColumn">
                                 <h3 class="gridHeader">Sprout</h3>
-                                <div class="waterControls">
-                                    <button class="waterBtn minus" data-stage="sprout">-</button>
-                                    <div class="waterDisplay" id="sproutWater">0</div>
-                                    <button class="waterBtn plus" data-stage="sprout">+</button>
+                                <div class="jugDisplay" id="sproutJugDisplay">
+                                    <div class="jugBottle">
+                                        <span class="jugHandle"></span>
+                                        <div class="jugLabel">?</div>
+                                    </div>
+                                </div>
+                                <div class="waterControls jugControls">
+                                    <button class="jugBtn" data-stage="sprout" data-size="s">S</button>
+                                    <button class="jugBtn" data-stage="sprout" data-size="m">M</button>
+                                    <button class="jugBtn" data-stage="sprout" data-size="l">L</button>
                                 </div>
                                 <div class="nutrientSelector" id="sproutNutrients">
                                     <!-- Nutrient options will go here -->
@@ -201,10 +217,16 @@
                             <!-- Vegetative Stage -->
                             <div class="stageColumn">
                                 <h3 class="gridHeader">Veg</h3>
-                                <div class="waterControls">
-                                    <button class="waterBtn minus" data-stage="vegetative">-</button>
-                                    <div class="waterDisplay" id="vegetativeWater">0</div>
-                                    <button class="waterBtn plus" data-stage="vegetative">+</button>
+                                <div class="jugDisplay" id="vegetativeJugDisplay">
+                                    <div class="jugBottle">
+                                        <span class="jugHandle"></span>
+                                        <div class="jugLabel">?</div>
+                                    </div>
+                                </div>
+                                <div class="waterControls jugControls">
+                                    <button class="jugBtn" data-stage="vegetative" data-size="s">S</button>
+                                    <button class="jugBtn" data-stage="vegetative" data-size="m">M</button>
+                                    <button class="jugBtn" data-stage="vegetative" data-size="l">L</button>
                                 </div>
                                 <div class="nutrientSelector" id="vegetativeNutrients">
                                     <!-- Nutrient options will go here -->
@@ -214,10 +236,16 @@
                             <!-- Flowering Stage -->
                             <div class="stageColumn">
                                 <h3 class="gridHeader">Flowering</h3>
-                                <div class="waterControls">
-                                    <button class="waterBtn minus" data-stage="flowering">-</button>
-                                    <div class="waterDisplay" id="floweringWater">0</div>
-                                    <button class="waterBtn plus" data-stage="flowering">+</button>
+                                <div class="jugDisplay" id="floweringJugDisplay">
+                                    <div class="jugBottle">
+                                        <span class="jugHandle"></span>
+                                        <div class="jugLabel">?</div>
+                                    </div>
+                                </div>
+                                <div class="waterControls jugControls">
+                                    <button class="jugBtn" data-stage="flowering" data-size="s">S</button>
+                                    <button class="jugBtn" data-stage="flowering" data-size="m">M</button>
+                                    <button class="jugBtn" data-stage="flowering" data-size="l">L</button>
                                 </div>
                                 <div class="nutrientSelector" id="floweringNutrients">
                                     <!-- Nutrient options will go here -->
@@ -518,21 +546,6 @@
             setTimeout(checkAndInit, 200);
         }
     </script>
-
-    <!-- Daily Slots Modal -->
-    <div id="slotsModal" class="slotsModal hidden">
-        <div class="slotsModalContent">
-            <h2>Daily Seed Spin</h2>
-            <div class="slotsContainer">
-                <div class="slot" id="slot1">🌱</div>
-                <div class="slot" id="slot2">💰</div>
-                <div class="slot" id="slot3">⚡</div>
-            </div>
-            <div id="slotsResultMsg">Spins left today: 1</div>
-            <button id="spinSlotsBtn" class="spinButton">SPIN</button>
-            <button id="continueSlotsBtn" class="continueButton" style="display: none;">Continue</button>
-        </div>
-    </div>
 
     <!-- Badge Modal -->
     <div id="badgeModal" class="badgeModal">

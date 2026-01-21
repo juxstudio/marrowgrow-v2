@@ -35,164 +35,142 @@ async function getSlotsSpinsToday() {
   return date === today ? count : 0;
 }
 
-async function showSlotsModal() {
-  console.log("🎰 Showing slots modal");
-  const modal = document.getElementById("slotsModal");
-  if (!modal) {
-    console.log("❌ Slots modal not found in DOM");
-    return;
-  }
-  modal.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
-  // Reset reels and message
-  document.getElementById("slot1").textContent = "🌱";
-  document.getElementById("slot2").textContent = "💰";
-  document.getElementById("slot3").textContent = "⚡";
-  const spinsToday = await getSlotsSpinsToday();
-  console.log(`🎯 Spins today: ${spinsToday}`);
-  document.getElementById("slotsResultMsg").textContent = `Spins left today: ${
-    1 - spinsToday
-  }`;
-  document.getElementById("spinSlotsBtn").disabled = spinsToday >= 1;
-  console.log("✅ Slots modal shown successfully");
+// Save spin results to localStorage
+function saveSpinResults(reels, seedsWon) {
+  const today = new Date().toISOString().slice(0, 10);
+  const data = { date: today, reels, seedsWon };
+  localStorage.setItem('dailySpinResult', JSON.stringify(data));
 }
 
-function hideSlotsModal() {
-  const modal = document.getElementById("slotsModal");
-  if (!modal) return;
-  modal.classList.add("hidden");
-  document.body.style.overflow = "";
+// Load spin results from localStorage (only if from today)
+function loadSpinResults() {
+  try {
+    const data = JSON.parse(localStorage.getItem('dailySpinResult'));
+    if (data && data.date === new Date().toISOString().slice(0, 10)) {
+      return { reels: data.reels, seedsWon: data.seedsWon };
+    }
+  } catch (e) { }
+  return null;
 }
 
 async function spinSlots() {
   const spinsToday = await getSlotsSpinsToday();
-  if (spinsToday >= 1) return; // Prevent extra spins
+  if (spinsToday >= 1) return;
+
   const icons = ["🌱", "💰", "⚡", "🦄"];
+  const container = document.getElementById("compactSlots");
+  const slots = [
+    document.getElementById("slot1"),
+    document.getElementById("slot2"),
+    document.getElementById("slot3")
+  ];
+  const resultEl = document.getElementById("compactSlotsResult");
+
+  if (!slots[0] || !container) return;
+
+  // Mark as spinning
+  container.classList.add("spinning");
+  resultEl.textContent = "";
+  resultEl.classList.remove("win", "loss");
+
+  // Determine final results
   let reels = [];
   for (let i = 0; i < 3; i++) {
     reels.push(icons[Math.floor(Math.random() * icons.length)]);
   }
 
-  // Animate reels
-  let spinCount = 0;
-  const spinInterval = setInterval(() => {
-    for (let i = 0; i < 3; i++) {
-      document.getElementById(`slot${i + 1}`).textContent =
-        icons[Math.floor(Math.random() * icons.length)];
-    }
-    spinCount++;
-    if (spinCount >= 20) {
-      clearInterval(spinInterval);
-      // Set final results
-      for (let i = 0; i < 3; i++) {
-        document.getElementById(`slot${i + 1}`).textContent = reels[i];
-      }
+  // Add spinning class to all slots
+  slots.forEach(slot => {
+    slot.classList.add("spinning");
+    slot.classList.remove("winner");
+  });
 
-      // Check for matches
+  // Animate random icons while spinning
+  const spinInterval = setInterval(() => {
+    slots.forEach(slot => {
+      slot.textContent = icons[Math.floor(Math.random() * icons.length)];
+    });
+  }, 80);
+
+  // Stop spinning after 1.5 seconds
+  setTimeout(() => {
+    clearInterval(spinInterval);
+
+    // Stop each reel with staggered timing and bounce effect
+    slots.forEach((slot, i) => {
+      setTimeout(() => {
+        slot.classList.remove("spinning");
+        slot.classList.add("stopping");
+        slot.textContent = reels[i];
+        // Remove stopping class after animation completes
+        setTimeout(() => slot.classList.remove("stopping"), 300);
+      }, i * 300);
+    });
+
+    // After all reels stop, check for wins
+    setTimeout(() => {
       let seedsWon = 0;
       if (reels[0] === reels[1] && reels[1] === reels[2]) {
-        // Three of a kind
         seedsWon = 3;
-        document.getElementById("slotsResultMsg").textContent =
-          "🎉 TRIPLE MATCH! You won 3 seeds!";
-      } else if (
-        reels[0] === reels[1] ||
-        reels[1] === reels[2] ||
-        reels[0] === reels[2]
-      ) {
-        // Two of a kind
+        slots.forEach(slot => slot.classList.add("winner"));
+      } else if (reels[0] === reels[1] || reels[1] === reels[2] || reels[0] === reels[2]) {
         seedsWon = 1;
-        document.getElementById("slotsResultMsg").textContent =
-          "🎯 DOUBLE MATCH! You won 1 seed!";
-      } else {
-        document.getElementById("slotsResultMsg").textContent =
-          "Better luck tomorrow!";
+        if (reels[0] === reels[1]) { slots[0].classList.add("winner"); slots[1].classList.add("winner"); }
+        if (reels[1] === reels[2]) { slots[1].classList.add("winner"); slots[2].classList.add("winner"); }
+        if (reels[0] === reels[2]) { slots[0].classList.add("winner"); slots[2].classList.add("winner"); }
       }
 
+      // Show result below emojis
       if (seedsWon > 0) {
+        resultEl.textContent = `+${seedsWon} Seed${seedsWon > 1 ? 's' : ''}!`;
+        resultEl.classList.add("win");
+
+        // Award seeds
         setLivesForPlayer(getLivesForPlayer() + seedsWon);
         saveHighScores();
         updateHighScoresDisplay();
-        // Update the seeds display to show the new count
         updateSeedsDisplayAfterSpin();
+        if (typeof updateLivesDisplay === "function") updateLivesDisplay();
 
-        // Force immediate UI update
-        if (typeof updateLivesDisplay === "function") {
-          updateLivesDisplay();
-        }
-
-        // Record slots win for badge tracking (async)
         (async () => {
           try {
             await PlayFabService.executeCloudScript("recordSlotsWin", {});
-            console.log("🎰 Slots win recorded for badge tracking");
           } catch (error) {
             console.error("Failed to record slots win:", error);
           }
         })();
-      }
-      setSlotsSpinToday();
-      document.getElementById("spinSlotsBtn").disabled = true;
-
-      // Immediately update the daily spin button to show it's been used
-      // This happens instantly while PlayFab processes in the background
-      const dailySpinBtn = document.getElementById("dailySpinBtn");
-      console.log("🎰 [DEBUG] Looking for dailySpinBtn:", dailySpinBtn);
-
-      if (dailySpinBtn) {
-        console.log("🎰 [DEBUG] Found dailySpinBtn, updating state...");
-        dailySpinBtn.classList.add("used");
-        dailySpinBtn.textContent = "Daily Spin (Used)";
-        console.log("🎰 Daily spin button immediately marked as used");
-        console.log("🎰 [DEBUG] Button text is now:", dailySpinBtn.textContent);
-        console.log(
-          "🎰 [DEBUG] Button classes:",
-          dailySpinBtn.classList.toString()
-        );
       } else {
-        console.error("🎰 [ERROR] dailySpinBtn not found!");
+        resultEl.textContent = "No match";
+        resultEl.classList.add("loss");
       }
 
-      setTimeout(() => {
-        hideSlotsModal();
+      // Mark spin as used
+      container.classList.remove("spinning");
+      container.classList.add("used");
 
-        // Try to update the button again after modal closes (fallback)
-        const dailySpinBtnRetry = document.getElementById("dailySpinBtn");
-        if (
-          dailySpinBtnRetry &&
-          !dailySpinBtnRetry.classList.contains("used")
-        ) {
-          console.log(
-            "🎰 [DEBUG] Retry: Updating daily spin button after modal close"
-          );
-          dailySpinBtnRetry.classList.add("used");
-          dailySpinBtnRetry.textContent = "Daily Spin (Used)";
-        }
-      }, 2500);
-    }
-  }, 80);
+      // Update button to grey/used state
+      const dailySpinBtn = document.getElementById("dailySpinBtn");
+      if (dailySpinBtn) {
+        dailySpinBtn.textContent = "Spin Used";
+        dailySpinBtn.classList.add("used");
+      }
+
+      // Save the spin data
+      setSlotsSpinToday();
+      saveSpinResults(reels, seedsWon);
+      // Don't call updateCompactSlotsState() here - it causes race condition
+
+    }, 1000); // Wait for all reels to stop (3 slots x 300ms stagger + buffer)
+  }, 1500);
 }
 
 // Setup event listeners for daily spin functionality
 function setupDailySpinEventListeners() {
-  // Set up slots modal event listeners
-  const spinBtn = document.getElementById("spinSlotsBtn");
-  if (spinBtn) {
-    spinBtn.onclick = spinSlots;
-  }
-
-  const continueBtn = document.getElementById("continueSlotsBtn");
-  if (continueBtn) {
-    continueBtn.onclick = function () {
-      hideSlotsModal();
-    };
-  }
-
-  // Set up daily spin button event listener (will be called when button is created)
+  // Set up Daily Spin button click handler
   setupDailySpinButtonListener();
 }
 
-// Setup the daily spin button event listener
+// Setup the Daily Spin button click listener
 function setupDailySpinButtonListener() {
   // Prevent multiple event listeners
   if (window.dailySpinListenerSetup) {
@@ -202,31 +180,84 @@ function setupDailySpinButtonListener() {
 
   window.dailySpinListenerSetup = true;
 
-  // Use event delegation since the button is created dynamically
+  // Use event delegation
   document.addEventListener("click", async function (event) {
-    if (event.target && event.target.id === "dailySpinBtn") {
-      console.log("Daily spin button clicked");
+    const btn = event.target.closest("#dailySpinBtn");
+    if (btn) {
+      console.log("Daily Spin button clicked");
+      // If button is already used, ignore
+      if (btn.classList.contains("used")) {
+        return;
+      }
       const canSpin = await canSpinSlotsToday();
       if (canSpin) {
-        await showSlotsModal();
-      } else {
-        alert("You've already used your daily spin today!");
+        // Grey out the button
+        btn.classList.add("used");
+        btn.textContent = "Spinning...";
+
+        // Start the spin animation (pill is already visible)
+        spinSlots();
       }
     }
   });
 }
 
-// Update daily spin button state based on usage
-async function updateDailySpinButtonState() {
+// Update compact slots state based on usage
+async function updateCompactSlotsState() {
+  const container = document.getElementById("compactSlots");
   const dailySpinBtn = document.getElementById("dailySpinBtn");
-  if (dailySpinBtn) {
-    const canSpin = await canSpinSlotsToday();
-    if (!canSpin) {
+  if (!container) return;
+
+  const slots = [
+    document.getElementById("slot1"),
+    document.getElementById("slot2"),
+    document.getElementById("slot3")
+  ];
+  const resultEl = document.getElementById("compactSlotsResult");
+  const canSpin = await canSpinSlotsToday();
+
+  if (!canSpin) {
+    // Already spun today - grey out button, show results in slots
+    if (dailySpinBtn) {
       dailySpinBtn.classList.add("used");
-      dailySpinBtn.textContent = "Daily Spin (Used)";
-    } else {
+      dailySpinBtn.textContent = "Spin Used";
+    }
+    container.classList.add("used");
+
+    const saved = loadSpinResults();
+    if (saved && saved.reels) {
+      slots.forEach((slot, i) => {
+        if (slot && saved.reels[i]) {
+          slot.textContent = saved.reels[i];
+        }
+      });
+      if (resultEl) {
+        if (saved.seedsWon > 0) {
+          resultEl.textContent = `+${saved.seedsWon} Seed${saved.seedsWon > 1 ? 's' : ''}!`;
+          resultEl.classList.add("win");
+        } else {
+          resultEl.textContent = "No match";
+          resultEl.classList.add("loss");
+        }
+      }
+    }
+  } else {
+    // Can spin - reset button and show question marks
+    if (dailySpinBtn) {
       dailySpinBtn.classList.remove("used");
       dailySpinBtn.textContent = "Daily Spin";
+    }
+    container.classList.remove("used");
+
+    slots.forEach((slot) => {
+      if (slot) {
+        slot.textContent = "?";
+        slot.classList.remove("winner");
+      }
+    });
+    if (resultEl) {
+      resultEl.textContent = "";
+      resultEl.classList.remove("win", "loss");
     }
   }
 }
@@ -241,9 +272,6 @@ document.addEventListener("DOMContentLoaded", function () {
 window.canSpinSlotsToday = canSpinSlotsToday;
 window.setSlotsSpinToday = setSlotsSpinToday;
 window.getSlotsSpinsToday = getSlotsSpinsToday;
-window.showSlotsModal = showSlotsModal;
-window.hideSlotsModal = hideSlotsModal;
 window.spinSlots = spinSlots;
 window.setupDailySpinEventListeners = setupDailySpinEventListeners;
-window.setupDailySpinButtonListener = setupDailySpinButtonListener;
-window.updateDailySpinButtonState = updateDailySpinButtonState;
+window.updateCompactSlotsState = updateCompactSlotsState;

@@ -1,7 +1,7 @@
 const PlayFabService = {
   // Initialize PlayFab
   initialize() {
-    PlayFab.settings.titleId = "B6749"; // Set to Marrow Grow's PlayFab Title ID
+    PlayFab.settings.titleId = "15C4CB"; // Set to Marrow Grow's DEV PlayFab Title ID
   },
 
   // Session management
@@ -518,7 +518,7 @@ const PlayFabService = {
             if (
               storedAnswerHash &&
               storedAnswerHash ===
-                this.hashPassword(securityAnswer.toLowerCase())
+              this.hashPassword(securityAnswer.toLowerCase())
             ) {
               // Validate new password
               const validation = this.validatePassword(newPassword);
