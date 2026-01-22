@@ -2252,6 +2252,11 @@ let gameTimer = null;
 let currentLight = "candle";
 let manualLightSelection = false; // Track if user manually selected a light
 
+// Rive animation state
+let riveInstance = null;
+let riveLoaded = false;
+const RIVE_ANIMATION_DURATION = 155; // 2:35 in seconds
+
 // Light sources configuration
 let lightSources = {
   candle: { name: "Candle Light", unlocked: true, yieldBonus: 1.0 },
@@ -2799,18 +2804,98 @@ function scheduleActOfGod() {
 
         // 30% chance to deflect
         if (Math.random() < 0.3) {
-          addEventToLog(
-            "The act of god was deflected by darker powers. Your plant is unharmed.",
-            "info"
-          );
+          showActOfGodOverlay(godEvent, true); // deflected
         } else {
-          godEvent.effect(plant);
-          addEventToLog(`Act of God: ${godEvent.message}`, "error");
+          showActOfGodOverlay(godEvent, false); // not deflected
         }
         actOfGodOccurred = true;
       }
     }, triggerAt * 500); // Convert to milliseconds (500ms per tick)
   }
+}
+
+// Show Act of God visual overlay with pause
+function showActOfGodOverlay(godEvent, deflected) {
+  const plantContainer = document.querySelector(".plantImageContainer");
+  if (!plantContainer) {
+    // Fallback if no container - just apply effect
+    if (!deflected) {
+      godEvent.effect(plant);
+      addEventToLog(`Act of God: ${godEvent.message}`, "error");
+    } else {
+      addEventToLog("The act of god was deflected by darker powers. Your plant is unharmed.", "info");
+    }
+    return;
+  }
+
+  // Pause the game
+  pauseGame();
+
+  // Pick random image from aog folder
+  const aogImage = Math.random() < 0.5 ? "img/aog/aog1.png" : "img/aog/aog2.png";
+
+  // Create overlay - just the image, no text or gradient
+  const overlay = document.createElement("div");
+  overlay.className = "actOfGodOverlay";
+  overlay.style.cssText = `
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('${aogImage}');
+    background-size: cover;
+    background-position: center;
+    z-index: 10001;
+    animation: actOfGodFadeIn 0.5s ease-out;
+  `;
+
+  // Add styles if not already present
+  if (!document.getElementById("actOfGodStyles")) {
+    const style = document.createElement("style");
+    style.id = "actOfGodStyles";
+    style.textContent = `
+      @keyframes actOfGodFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes actOfGodFadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  plantContainer.appendChild(overlay);
+
+  // After 3 seconds, remove overlay and resume
+  setTimeout(() => {
+    overlay.style.animation = "actOfGodFadeOut 0.5s ease-out forwards";
+    setTimeout(() => {
+      overlay.remove();
+
+      // Apply effect after overlay closes
+      if (!deflected) {
+        godEvent.effect(plant);
+        addEventToLog(`Act of God: ${godEvent.message}`, "error");
+      } else {
+        addEventToLog("The act of god was deflected by darker powers. Your plant is unharmed.", "info");
+      }
+
+      // Resume the game
+      resumeGame();
+    }, 500);
+  }, 3000);
+}
+
+// Test function for Act of God (development only)
+if (typeof CURRENT_ENV !== 'undefined' && CURRENT_ENV.DEBUG) {
+  window.testActOfGod = function () {
+    const testEvent = actsOfGod[Math.floor(Math.random() * actsOfGod.length)];
+    console.log("🧪 Testing Act of God:", testEvent);
+    showActOfGodOverlay(testEvent, Math.random() < 0.3);
+  };
 }
 
 // Light failure system
@@ -2826,8 +2911,7 @@ function turnOffLights() {
 
   lightIsOn = false;
   lightOffStartTime = Date.now();
-  plant.health = Math.floor(Math.random() * 41) + 30; // Set health to 30-70
-  lightOffHealthDrainRate = 0.05;
+  window.healthBeforeLightsOut = plant.health; // Store health before any damage
 
   addEventToLog("Lights have gone out! Fix them quickly!", "warning");
   updatePlantStatus();
@@ -2836,13 +2920,150 @@ function turnOffLights() {
 
 function fixLights() {
   if (!lightIsOn) {
+    // Calculate how long lights were off
+    const timeOff = lightOffStartTime ? Math.floor((Date.now() - lightOffStartTime) / 1000) : 0;
+    const healthBefore = window.healthBeforeLightsOut || plant.health;
+
+    // Calculate damage based on time in the dark (2% per second, max 50%)
+    const damagePercent = Math.min(50, timeOff * 2);
+    const healthLost = Math.round((healthBefore * damagePercent) / 100);
+
+    // Apply the damage now
+    plant.health = Math.max(1, healthBefore - healthLost);
+
     lightIsOn = true;
     lightOffStartTime = null;
     lightOffHealthDrainRate = 0;
+
+    // Show results popup
+    showLightsFixedPopup(timeOff, healthLost);
+
     addEventToLog("Lights are back on!", "info");
     updatePlantStatus();
     updateResourceBars();
   }
+}
+
+// Show popup when lights are fixed
+function showLightsFixedPopup(timeOff, healthLost) {
+  const plantContainer = document.querySelector(".plantImageContainer");
+  if (!plantContainer) return;
+
+  const popup = document.createElement("div");
+  popup.className = "lightsFixedPopup";
+
+  // Determine result based on response time
+  let resultText, resultClass;
+  if (timeOff <= 2) {
+    resultText = "QUICK FIX!";
+    resultClass = "perfect";
+  } else if (timeOff <= 5) {
+    resultText = "FIXED!";
+    resultClass = "good";
+  } else if (timeOff <= 10) {
+    resultText = "FINALLY...";
+    resultClass = "ok";
+  } else {
+    resultText = "TOO SLOW!";
+    resultClass = "bad";
+  }
+
+  popup.innerHTML = `
+    <div class="lightsResultTitle ${resultClass}">${resultText}</div>
+    <div class="lightsResultStats">
+      <div class="lightsResultRow">${timeOff}s IN THE DARK</div>
+      ${healthLost > 0 ? `<div class="lightsResultRow penalty">-${healthLost}% HEALTH</div>` : `<div class="lightsResultRow bonus">NO DAMAGE!</div>`}
+    </div>
+  `;
+
+  // Add styles if not already added
+  if (!document.getElementById("lightsFixedStyles")) {
+    const style = document.createElement("style");
+    style.id = "lightsFixedStyles";
+    style.textContent = `
+      .lightsFixedPopup {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 40%;
+        background: #000000;
+        border: 2px solid #ffd700;
+        border-radius: 6px;
+        padding: 6px;
+        z-index: 10001;
+        text-align: center;
+        font-family: 'Press Start 2P', monospace;
+        animation: lightsPopupIn 0.4s ease-out forwards;
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+      }
+      
+      @keyframes lightsPopupIn {
+        0% {
+          transform: scale(0.5);
+          opacity: 0;
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      
+      @keyframes lightsPopupOut {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(0.5);
+          opacity: 0;
+        }
+      }
+      
+      .lightsResultTitle {
+        font-size: 0.9em;
+        margin-bottom: 8px;
+        text-shadow: 0 0 10px currentColor;
+      }
+      
+      .lightsResultTitle.perfect { color: #00ff41; }
+      .lightsResultTitle.good { color: #ffd700; }
+      .lightsResultTitle.ok { color: #ff8c00; }
+      .lightsResultTitle.bad { color: #ff4444; }
+      
+      .lightsResultStats {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .lightsResultRow {
+        font-size: 0.5em;
+        color: #ffffff;
+      }
+      
+      .lightsResultRow.penalty {
+        color: #ff4444;
+      }
+      
+      .lightsResultRow.bonus {
+        color: #00ff41;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  plantContainer.appendChild(popup);
+
+  // Remove popup after delay
+  setTimeout(() => {
+    popup.style.animation = "lightsPopupOut 0.3s ease-out forwards";
+    setTimeout(() => {
+      if (popup.parentNode) popup.remove();
+    }, 300);
+  }, 2500);
 }
 
 // Helper function to get the best unlocked light
@@ -2958,6 +3179,193 @@ function initializeGameSimulation() {
 
   // Start the game loop
   startGameLoop();
+
+  // Initialize Rive animation for plant growth
+  initializeRiveAnimation();
+}
+
+// ========================================
+// RIVE ANIMATION SYSTEM
+// ========================================
+
+// Rive state for ViewModel data binding control
+let riveStateMachineName = null;
+let riveTimelineInput = null;  // Reference to "maintimelineslide" ViewModel property (1-100)
+
+// Initialize Rive animation for plant growth visualization
+async function initializeRiveAnimation() {
+  const canvas = document.getElementById('riveCanvas');
+  if (!canvas) {
+    console.warn('Rive canvas not found, using fallback images');
+    showFallbackPlantImage();
+    return;
+  }
+
+  // Check if Rive runtime is available
+  if (typeof rive === 'undefined') {
+    console.warn('Rive runtime not loaded, using fallback images');
+    showFallbackPlantImage();
+    return;
+  }
+
+  try {
+    // Fetch the Rive file as ArrayBuffer (this is required for proper loading)
+    console.log('🌱 Fetching Rive animation file...');
+    const response = await fetch('img/rive/floweranimationThis.riv');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch Rive file: ${response.status}`);
+    }
+    const buffer = await response.arrayBuffer();
+    console.log('🌱 Rive file loaded:', buffer.byteLength, 'bytes');
+
+    riveInstance = new rive.Rive({
+      buffer: buffer,
+      canvas: canvas,
+      autoplay: true,
+      autoBind: true,  // Enable ViewModel auto-binding
+      artboard: 'mainartboard',
+      stateMachines: 'State Machine 2',
+      layout: new rive.Layout({
+        fit: rive.Fit.Contain,
+        alignment: rive.Alignment.Center
+      }),
+      onLoad: () => {
+        console.log('🌱 Rive animation loaded successfully');
+        console.log('🌱 Artboard:', riveInstance.artboardName);
+        console.log('🌱 Animations:', riveInstance.animationNames);
+        console.log('🌱 State machines:', riveInstance.stateMachineNames);
+
+        riveLoaded = true;
+
+        // Resize drawing surface to match canvas
+        riveInstance.resizeDrawingSurfaceToCanvas();
+
+        // Get state machine and play it
+        const smNames = riveInstance.stateMachineNames;
+        if (smNames && smNames.length > 0) {
+          riveStateMachineName = smNames[0];
+          console.log('🌱 Playing state machine:', riveStateMachineName);
+          riveInstance.play(riveStateMachineName);
+        }
+
+        // Try to get ViewModel instance for data binding
+        const vmi = riveInstance.viewModelInstance;
+        if (vmi) {
+          console.log('🌱 ViewModel instance found');
+
+          // Try to get the maintimelineslide number property
+          try {
+            riveTimelineInput = vmi.number('maintimelineslide');
+            if (riveTimelineInput) {
+              console.log('🌱 Found maintimelineslide property!');
+              riveTimelineInput.value = 0;  // Start at beginning
+              console.log('🌱 Set initial value to 0');
+            }
+          } catch (e) {
+            console.warn('🌱 Could not get maintimelineslide:', e);
+          }
+        } else {
+          console.log('🌱 No ViewModel instance - trying state machine inputs');
+
+          // Fallback: try state machine inputs
+          if (riveStateMachineName) {
+            const inputs = riveInstance.stateMachineInputs(riveStateMachineName);
+            if (inputs && inputs.length > 0) {
+              console.log('🌱 State machine inputs:', inputs.map(i => `${i.name}(type:${i.type})`));
+
+              // Look for maintimelineslide or similar
+              riveTimelineInput = inputs.find(i =>
+                i.name === 'maintimelineslide' ||
+                i.name === 'maintimlineslide' ||
+                i.name.toLowerCase().includes('timeline')
+              );
+
+              if (riveTimelineInput) {
+                console.log('🌱 Found timeline input:', riveTimelineInput.name);
+                riveTimelineInput.value = 1;
+              }
+            }
+          }
+        }
+
+        console.log('🌱 Rive ready - progress controlled by maintimelineslide (1-100)');
+      },
+      onLoadError: (err) => {
+        console.error('🌱 Rive load error:', err);
+        showFallbackPlantImage();
+      }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      if (riveInstance) {
+        riveInstance.resizeDrawingSurfaceToCanvas();
+      }
+    });
+
+  } catch (error) {
+    console.error('🌱 Failed to initialize Rive:', error);
+    showFallbackPlantImage();
+  }
+}
+
+// Show fallback image-based animation
+function showFallbackPlantImage() {
+  const canvas = document.getElementById('riveCanvas');
+  const img = document.getElementById('plantStageImage');
+  if (canvas) canvas.style.display = 'none';
+  if (img) img.style.display = 'block';
+  riveLoaded = false;
+}
+
+// Start the Rive animation with correct playback speed
+function startRiveAnimation() {
+  if (!riveLoaded || !riveInstance || !riveStateMachineName) {
+    console.log('🌱 Rive not ready, cannot start animation');
+    return;
+  }
+
+  // Calculate simulation duration in seconds
+  // Total ticks = sum of all growth stage times = 32 + 48 + 64 = 144 ticks
+  // Each tick = 500ms, so total = 72 seconds
+  const simulationDurationSeconds = 72;
+
+  // Calculate playback speed: Rive animation needs to complete in simulation time
+  // Speed = animation_duration / simulation_duration = 155 / 72 ≈ 2.15
+  const playbackSpeed = RIVE_ANIMATION_DURATION / simulationDurationSeconds;
+
+  console.log(`🌱 Starting Rive animation at ${playbackSpeed.toFixed(2)}x speed`);
+  console.log(`🌱 Animation: ${RIVE_ANIMATION_DURATION}s, Simulation: ${simulationDurationSeconds}s`);
+
+  // Note: Rive web runtime doesn't have direct speed control for state machines
+  // The animation will play at normal speed - this is a limitation
+  // For proper syncing, we'd need to use timeline scrubbing with an input
+  riveInstance.play(riveStateMachineName);
+}
+
+// Pause the Rive animation
+function pauseRiveAnimation() {
+  if (riveLoaded && riveInstance && riveStateMachineName) {
+    riveInstance.pause(riveStateMachineName);
+  }
+}
+
+// Resume the Rive animation
+function resumeRiveAnimation() {
+  if (riveLoaded && riveInstance && riveStateMachineName) {
+    riveInstance.play(riveStateMachineName);
+  }
+}
+
+// Clean up Rive instance when game ends
+function cleanupRive() {
+  if (riveInstance) {
+    riveInstance.cleanup();
+    riveInstance = null;
+    riveLoaded = false;
+    riveStateMachineName = null;
+    riveTimelineInput = null;
+  }
 }
 
 function updateSelectionIcons() {
@@ -3009,10 +3417,20 @@ function updatePlantStatus() {
     currentStage.textContent = stageNames[plant.growthStage] || "SPROUT";
   }
 
-  // Update health
+  // Update health with dynamic color
   const healthValue = document.getElementById("healthValue");
   if (healthValue) {
-    healthValue.textContent = `${Math.round(plant.health)}%`;
+    const health = Math.round(plant.health);
+    healthValue.textContent = `${health}%`;
+
+    // Color based on health level: green (70+), yellow (40-69), orange (<40)
+    if (health >= 70) {
+      healthValue.style.color = "#00ff41"; // Green
+    } else if (health >= 40) {
+      healthValue.style.color = "#ffcc00"; // Yellow
+    } else {
+      healthValue.style.color = "#ff6600"; // Orange
+    }
   }
 
   // Update plant image
@@ -3021,8 +3439,47 @@ function updatePlantStatus() {
 
 function updatePlantImage() {
   const plantContainer = document.querySelector(".plantImageContainer");
+  if (!plantContainer) return;
+
+  // Calculate total growth progress (0 to 1)
+  let elapsed = 0;
+  for (let i = 0; i < plant.growthStage; i++) {
+    elapsed += growthStages[i].time;
+  }
+  elapsed += plant.stageTime;
+  const progress = Math.min(1, elapsed / plant.totalGrowthTime);
+
+  // Animation has 32 keyframes, controlled by maintimelineslide property (0-1)
+  const TOTAL_FRAMES = 32;
+
+  // If Rive is loaded and we have the timeline input, set the progress value
+  if (riveLoaded && riveInstance && riveTimelineInput) {
+    // Map progress (0-1) to maintimelineslide value (0-1)
+    const timelineValue = progress;  // Range: 0 to 1
+    const expectedFrame = Math.floor(progress * TOTAL_FRAMES);
+
+    // Debug: log every update to see all frames
+    console.log(`🌱 Progress: ${(progress * 100).toFixed(1)}% | Frame ~${expectedFrame}/${TOTAL_FRAMES} | Timeline: ${timelineValue.toFixed(3)}`);
+
+    try {
+      // Set the maintimelineslide value to control animation frame
+      riveTimelineInput.value = timelineValue;
+    } catch (e) {
+      console.warn('🌱 Timeline update failed:', e);
+    }
+  } else if (!riveLoaded || !riveInstance) {
+    // Fallback to image-based animation
+    updatePlantImageFallback();
+  }
+
+  // Handle light overlay (lights out effect)
+  updateLightOverlay(plantContainer);
+}
+
+// Fallback function using original image-based animation
+function updatePlantImageFallback() {
   const plantImage = document.getElementById("plantStageImage");
-  if (!plantImage || !plantContainer) return;
+  if (!plantImage) return;
 
   const stage = growthStages[plant.growthStage];
   let imagePath;
@@ -3040,8 +3497,12 @@ function updatePlantImage() {
   }
 
   plantImage.src = imagePath + `?v=${Date.now()}`;
+}
 
-  // Add light overlay when lights are off
+// Handle the lights-out overlay effect
+function updateLightOverlay(plantContainer) {
+  if (!plantContainer) return;
+
   let existingOverlay = plantContainer.querySelector(".light-overlay");
   if (!lightIsOn) {
     if (!existingOverlay) {
@@ -3140,20 +3601,7 @@ function showRaiderEvent() {
   }, 5000);
 }
 
-function showNutrientEvent() {
-  nutrientActive = true;
-  addEventToLog("Nutrient boost available!", "info");
-
-  setTimeout(() => {
-    const boostPercent = Math.floor(Math.random() * 10) + 5;
-    plant.potencyBoost *= 1 + boostPercent / 100;
-    addEventToLog(
-      `Nutrient boost applied! Potency increased by ${boostPercent}%.`,
-      "info"
-    );
-    nutrientActive = false;
-  }, 3000);
-}
+// showNutrientEvent is now handled by missing-data.js with the interactive bubble mini-game
 
 function updateEventsList() {
   const eventsList = document.querySelector(".eventsList");
@@ -3167,6 +3615,30 @@ function updateEventsList() {
 }
 
 let feedingTick = 0; // Local feeding tick counter like in backup.js
+let gamePaused = false; // Flag to track if game is paused
+
+// Pause the game timer
+function pauseGame() {
+  if (gameTimer) {
+    clearInterval(gameTimer);
+    gameTimer = null;
+    gamePaused = true;
+    console.log("⏸️ Game paused");
+  }
+}
+
+// Resume the game timer
+function resumeGame() {
+  if (gamePaused) {
+    gamePaused = false;
+    startGameLoop();
+    console.log("▶️ Game resumed");
+  }
+}
+
+// Make pause/resume globally accessible for Act of God events
+window.pauseGame = pauseGame;
+window.resumeGame = resumeGame;
 
 function startGameLoop() {
   console.log("Game loop starting with schedule:", plant.feedingSchedule);
@@ -3175,6 +3647,7 @@ function startGameLoop() {
   }
 
   console.log("Starting game loop...");
+  // Rive animation progress is now controlled by updatePlantImage via startFinish input
 
   let feedingTick = 0; // Local feeding tick counter like in backup.js
   // Right after feedingTick++
@@ -3392,12 +3865,143 @@ function gameOver() {
   clearInterval(gameTimer);
   addEventToLog("Your plant has died from neglect!", "error");
 
-  setTimeout(async () => {
-    alert("Game Over! Your plant died. Starting over...");
-    // Reset game state to clear event listener flags
-    resetGameState();
-    await renderSeedSelectionInterface();
-  }, 2000);
+  // Show death popup after brief delay
+  setTimeout(() => {
+    showDeathPopup();
+  }, 500);
+}
+
+function showDeathPopup() {
+  // Funny death messages
+  const deathMessages = [
+    "Your plant has shuffled off this mortal coil...",
+    "RIP little sprout. You tried. Kind of.",
+    "Congratulations! You've created plant compost.",
+    "Your plant has gone to the great greenhouse in the sky.",
+    "That's one way to make fertilizer, I guess.",
+    "Your plant died of disappointment. In you.",
+    "The circle of life... just got a lot shorter.",
+    "Plant Status: Extra Dead 💀",
+    "You forgot the 'alive' part of keeping it alive.",
+    "Achievement Unlocked: Plant Murderer"
+  ];
+
+  const randomMessage = deathMessages[Math.floor(Math.random() * deathMessages.length)];
+
+  // Create popup overlay
+  const overlay = document.createElement("div");
+  overlay.className = "deathPopupOverlay";
+  overlay.innerHTML = `
+    <div class="deathPopup">
+      <div class="deathSkull">💀</div>
+      <div class="deathTitle">GAME OVER</div>
+      <div class="deathMessage">${randomMessage}</div>
+      <button class="deathContinueBtn">CONTINUE</button>
+    </div>
+  `;
+
+  // Add styles
+  if (!document.getElementById("deathPopupStyles")) {
+    const style = document.createElement("style");
+    style.id = "deathPopupStyles";
+    style.textContent = `
+      .deathPopupOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        animation: fadeIn 0.5s ease-out;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      .deathPopup {
+        background: linear-gradient(180deg, #1a0a0a 0%, #0d0d0d 100%);
+        border: 3px solid #ff3333;
+        border-radius: 12px;
+        padding: 30px 40px;
+        text-align: center;
+        max-width: 400px;
+        box-shadow: 0 0 40px rgba(255, 0, 0, 0.4), inset 0 0 20px rgba(255, 0, 0, 0.1);
+        animation: popIn 0.4s ease-out;
+      }
+      
+      @keyframes popIn {
+        0% { transform: scale(0.5); opacity: 0; }
+        70% { transform: scale(1.05); }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      
+      .deathSkull {
+        font-size: 80px;
+        margin-bottom: 10px;
+        animation: skullBounce 1s ease-in-out infinite;
+        filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.5));
+      }
+      
+      @keyframes skullBounce {
+        0%, 100% { transform: translateY(0) rotate(-5deg); }
+        50% { transform: translateY(-10px) rotate(5deg); }
+      }
+      
+      .deathTitle {
+        font-family: 'Press Start 2P', monospace;
+        font-size: 1.5em;
+        color: #ff3333;
+        margin-bottom: 15px;
+        text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+      }
+      
+      .deathMessage {
+        font-family: 'Press Start 2P', monospace;
+        font-size: 0.6em;
+        color: #cccccc;
+        margin-bottom: 25px;
+        line-height: 1.6;
+      }
+      
+      .deathContinueBtn {
+        font-family: 'Press Start 2P', monospace;
+        font-size: 0.8em;
+        padding: 12px 30px;
+        background: linear-gradient(180deg, #ff4444 0%, #cc0000 100%);
+        border: 2px solid #ff6666;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      }
+      
+      .deathContinueBtn:hover {
+        transform: scale(1.05);
+        background: linear-gradient(180deg, #ff5555 0%, #dd1111 100%);
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  document.body.appendChild(overlay);
+
+  // Handle continue button
+  overlay.querySelector(".deathContinueBtn").onclick = async function () {
+    overlay.style.animation = "fadeIn 0.3s ease-out reverse forwards";
+    setTimeout(async () => {
+      overlay.remove();
+      resetGameState();
+      await renderSeedSelectionInterface();
+    }, 300);
+  };
 }
 
 // Add score submission to harvest screen
@@ -3726,25 +4330,29 @@ async function showHarvestScreen() {
     console.log("Scores already submitted, skipping");
   }
 
-  // Add test button to page for debugging
-  document.addEventListener("DOMContentLoaded", () => {
-    // Google client will be initialized by initClient() in HTML after SDK loads
-    console.log("DOM loaded, waiting for Google SDK initialization...");
+  // Add test button to page for debugging (development only)
+  if (typeof CURRENT_ENV !== 'undefined' && CURRENT_ENV.DEBUG) {
+    document.addEventListener("DOMContentLoaded", () => {
+      // Add a test button for debugging
+      const testBtn = document.createElement("button");
+      testBtn.textContent = "Test GROWLAB";
+      testBtn.style.cssText =
+        "position: fixed; top: 10px; left: 10px; z-index: 9999; padding: 10px; background: red; color: white; border: none; cursor: pointer;";
+      testBtn.onclick = testGROWLABInterface;
+      document.body.appendChild(testBtn);
 
-    // Add a test button for debugging
-    const testBtn = document.createElement("button");
-    testBtn.textContent = "Test GROWLAB";
-    testBtn.style.cssText =
-      "position: fixed; top: 10px; left: 10px; z-index: 9999; padding: 10px; background: red; color: white; border: none; cursor: pointer;";
-    testBtn.onclick = testGROWLABInterface;
-    document.body.appendChild(testBtn);
-
-    // Add component switching test to window
-    window.testComponentSwitching = testComponentSwitching;
-    console.log(
-      "🧪 Component switching test available: window.testComponentSwitching()"
-    );
-  });
+      // Add component switching test to window
+      window.testComponentSwitching = testComponentSwitching;
+      console.log(
+        "🧪 Component switching test available: window.testComponentSwitching()"
+      );
+    });
+  } else {
+    // Production: just initialize Google SDK
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("DOM loaded, waiting for Google SDK initialization...");
+    });
+  }
 }
 
 function startGameSimulation() {
@@ -4309,8 +4917,10 @@ function testBadgePopup() {
   }
 }
 
-// Make test function globally available
-window.testBadgePopup = testBadgePopup;
+// Make test function globally available (development only)
+if (typeof CURRENT_ENV !== 'undefined' && CURRENT_ENV.DEBUG) {
+  window.testBadgePopup = testBadgePopup;
+}
 
 // Function to reset badge popup tracking (for testing)
 async function resetBadgePopups() {

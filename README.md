@@ -146,3 +146,87 @@ This project contains the complete Marrow Grow game, including both the original
 - The current active implementation uses `newgame.html`, `newgame.js`, and `new.css`
 - Data structures are defined in `missing-data.js` and `missing-data-backup.js`
 - PlayFab integration provides cloud save and user management
+
+## Rive ViewModel Integration (Micro-Interaction Control)
+
+This project uses **Rive animations with ViewModel data binding** to create smooth, progress-controlled animations. Instead of playing animations at a fixed speed, we bind ViewModel properties to control the exact frame position.
+
+### How It Works
+
+1. **Create a ViewModel in Rive Editor**: Define a number property (e.g., `maintimelineslide`) that ranges from 0-1
+2. **Bind the property to timeline position**: In Rive, connect this property to drive the animation's timeline
+3. **Set `autoBind: true`** in JavaScript to automatically expose the ViewModel
+4. **Control animation frame** by setting the property value (0 = start, 1 = end)
+
+### Implementation Pattern
+
+```javascript
+// 1. Load Rive with autoBind enabled
+const riveInstance = new rive.Rive({
+  buffer: buffer,                    // Fetch .riv file as ArrayBuffer
+  canvas: canvas,
+  autoplay: true,
+  autoBind: true,                    // KEY: Enables ViewModel auto-binding
+  artboard: 'mainartboard',          // Specify artboard name
+  stateMachines: 'State Machine 2',  // Specify state machine name
+  layout: new rive.Layout({
+    fit: rive.Fit.Contain,
+    alignment: rive.Alignment.Center
+  }),
+  onLoad: () => {
+    // 2. Access the auto-bound ViewModel instance
+    const vmi = riveInstance.viewModelInstance;
+    
+    if (vmi) {
+      // 3. Get the number property accessor
+      const timelineAccessor = vmi.number('maintimelineslide');
+      
+      if (timelineAccessor) {
+        // 4. Set value to control animation position (0-1 range)
+        timelineAccessor.value = 0.5;  // 50% through animation
+      }
+    }
+  }
+});
+```
+
+### Key Configuration Details
+
+| Parameter | Value | Notes |
+|-----------|-------|-------|
+| `autoBind` | `true` | Required to expose `viewModelInstance` |
+| `artboard` | Artboard name from Rive file | e.g., `'mainartboard'` |
+| `stateMachines` | State machine name | e.g., `'State Machine 2'` |
+| Property range | `0` to `1` | NOT 0-100 or 1-100 |
+
+### In This Project
+
+The plant growth animation (`floweranimationThis.riv`) has 32 keyframes controlled by `maintimelineslide`:
+
+```javascript
+// In updatePlantImage() - newgame.js
+const progress = elapsed / plant.totalGrowthTime;  // 0 to 1
+riveTimelineInput.value = progress;                // Directly sets animation position
+```
+
+### Rive Editor Setup
+
+1. **Create a ViewModel** in the Rive editor (e.g., "View Model 2")
+2. **Add a Number property** named `maintimelineslide`
+3. **Create an Instance** of the ViewModel
+4. **Bind the timeline** to this property using Rive's data binding features
+5. The timeline will scrub from start (0) to end (1) based on the property value
+
+### Debug Page
+
+Use `rive-debug.html` to test ViewModel binding interactively with a slider before integrating into the main game.
+
+### Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| `viewModelInstance` is null | Ensure `autoBind: true` and correct artboard/stateMachine names |
+| Animation plays automatically | Animation should play; value changes control position within it |
+| Jumps to end on any change | Check value range - use 0-1, not 1-100 |
+| No response to value changes | Verify the ViewModel property is correctly bound to the timeline in Rive |
+

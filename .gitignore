@@ -1,0 +1,21 @@
+# Development and Test Files
+rive-debug.html
+rive-test.html
+t.js
+
+# Blurz Demo (reference only, not for production)
+Blurzfinal - Copy/
+
+# Node modules (if any)
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Logs
+*.log

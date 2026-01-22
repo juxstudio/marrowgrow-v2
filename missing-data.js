@@ -970,11 +970,11 @@ function maybeTriggerEvent() {
 
   // Flowering stage: can trigger raiders or nutrient boost
   if (growthStages[plant.growthStage].name === "Flowering") {
-    // 5% chance for raiders, 5% for nutrient boost (reduced from 15% and 10%)
+    // 8% chance for nutrient boost, 5% for raiders
     var rand = Math.random();
-    if (rand < 0.05) {
+    if (rand < 0.08 && !nutrientActive) {
       showNutrientEvent();
-    } else if (rand < 0.1) {
+    } else if (rand < 0.13) {
       showRaiderEvent();
     }
   } else {
@@ -989,9 +989,9 @@ function maybeTriggerEvent() {
 // 🐛 PEST SWATTING MINI-GAME v2
 // ===============================
 
-// Map different pest types to emoji sets - limited to well-rendering bugs
+// Map different pest types to emoji sets - all bug emojis
 const pestEmojiMap = {
-  pest: ["🕷️", "🦗"],
+  pest: ["🐛", "🐜", "🐝", "🦗", "🕷️", "🐞"],
   raider: ["🏴‍☠️", "🧛‍♂️", "🦹‍♂️"],
   nutrient: ["🧪", "🍄", "💧"],
 };
@@ -1037,6 +1037,27 @@ function showSwatFeedback(pestElement) {
         100% { 
           transform: scale(1) translateY(-40px);
           opacity: 0;
+        }
+      }
+      @keyframes pestFall {
+        0% {
+          top: -40px;
+          opacity: 0;
+        }
+        5% {
+          opacity: 1;
+        }
+        100% {
+          top: 100%;
+          opacity: 1;
+        }
+      }
+      @keyframes pestSway {
+        0%, 100% {
+          margin-left: 0;
+        }
+        50% {
+          margin-left: 15px;
         }
       }
     `;
@@ -1123,29 +1144,61 @@ function showPestEvent() {
   }
 }
 
-// Make showPestEvent globally accessible for testing
-window.showPestEvent = showPestEvent;
-console.log(
-  "🔧 showPestEvent function attached to window:",
-  typeof window.showPestEvent
-);
-
-// Add a simple test function
-window.testPest = function () {
-  console.log("🧪 Test function called - pest system is working!");
-  console.log("Pest UI active:", pestUIActive);
-  console.log("Light is on:", lightIsOn);
+// Make showPestEvent and testPest globally accessible (development only)
+if (typeof CURRENT_ENV !== 'undefined' && CURRENT_ENV.DEBUG) {
+  window.showPestEvent = showPestEvent;
   console.log(
-    "Plant container exists:",
-    !!document.querySelector(".plantImageContainer")
+    "🔧 showPestEvent function attached to window:",
+    typeof window.showPestEvent
   );
-  return "Test successful!";
-};
+
+  // Add a simple test function
+  window.testPest = function () {
+    console.log("🧪 Test function called - pest system is working!");
+    console.log("Pest UI active:", pestUIActive);
+    console.log("Light is on:", lightIsOn);
+    console.log(
+      "Plant container exists:",
+      !!document.querySelector(".plantImageContainer")
+    );
+    return "Test successful!";
+  };
+}
 
 function startPestMinigame(
   type = "pest",
   { count = 1, duration = 8000, pestType = null } = {}
 ) {
+  // Inject CSS keyframes for pest animations BEFORE spawning
+  if (!document.getElementById("pestAnimations")) {
+    const style = document.createElement("style");
+    style.id = "pestAnimations";
+    style.textContent = `
+      @keyframes pestFall {
+        0% {
+          top: -40px;
+          opacity: 0;
+        }
+        5% {
+          opacity: 1;
+        }
+        100% {
+          top: 100%;
+          opacity: 1;
+        }
+      }
+      @keyframes pestSway {
+        0%, 100% {
+          margin-left: 0;
+        }
+        50% {
+          margin-left: 15px;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   const plantContainer = document.querySelector(".plantImageContainer");
   console.log("🌿 Pest container found:", plantContainer);
 
@@ -1199,7 +1252,7 @@ function startPestMinigame(
   let totalSpawned = 0;
   let swatted = 0;
   let missed = 0;
-  const maxSpawn = Math.floor(duration / 700);
+  const maxSpawn = Math.floor(Math.random() * 8) + 4; // Random 4-11 pests
 
   function spawnPest() {
     if (totalSpawned >= maxSpawn || !pestUIActive) return;
@@ -1209,22 +1262,27 @@ function startPestMinigame(
     const pest = document.createElement("span");
     pest.textContent = emojis[Math.floor(Math.random() * emojis.length)];
     console.log("Spawning pest emoji", pest.textContent);
+
+    // Start from top, random X position
+    const startX = Math.random() * (width - 40);
+    const fallDuration = 4000 + Math.random() * 2000; // 4-6 seconds to fall
+
     pest.style.cssText = `
       position: absolute;
-      left: ${Math.random() * (width - 40)}px;
-      top: ${Math.random() * (height - 40)}px;
+      left: ${startX}px;
+      top: -40px;
       font-size: clamp(22px, 4vw, 38px);
       cursor: pointer;
       user-select: none;
       pointer-events: auto;
-      transition: transform 0.1s, opacity 0.15s;
       z-index: 10000;
+      animation: pestFall ${fallDuration}ms linear forwards, pestSway 0.8s ease-in-out infinite;
     `;
 
-    const dx = (Math.random() - 0.5) * 3;
-    const dy = (Math.random() - 0.5) * 3;
-    pest.dataset.dx = dx;
-    pest.dataset.dy = dy;
+    // Direction for sway (left or right bias)
+    const swayDirection = Math.random() > 0.5 ? 1 : -1;
+    pest.dataset.swayDir = swayDirection;
+    pest.dataset.startX = startX;
 
     pest.addEventListener("click", () => {
       if (!pest.parentNode) return; // Already removed
@@ -1235,6 +1293,7 @@ function startPestMinigame(
       // Show "SWAT!" feedback
       showSwatFeedback(pest);
 
+      pest.style.animation = "none";
       pest.style.transform = "scale(0.3) rotate(45deg)";
       pest.style.opacity = "0";
       setTimeout(() => {
@@ -1249,9 +1308,9 @@ function startPestMinigame(
 
     pestOverlayEl.appendChild(pest);
 
-    // Auto-remove after timeout (longer duration)
-    setTimeout(() => {
-      if (pest.parentNode) {
+    // Bug missed when it reaches the bottom (animation ends)
+    pest.addEventListener("animationend", (e) => {
+      if (e.animationName === "pestFall" && pest.parentNode) {
         missed++;
         activePests--;
         pest.style.opacity = "0";
@@ -1259,29 +1318,12 @@ function startPestMinigame(
           if (pest.parentNode) pest.remove();
         }, 200);
       }
-    }, 4000 + Math.random() * 2000);
+    });
   }
 
-  // Wiggle animation
+  // Wiggle animation is now handled by CSS (pestSway keyframes)
+  // Just clear any existing interval
   clearInterval(pestWiggleInterval);
-  pestWiggleInterval = setInterval(() => {
-    if (!pestUIActive) return;
-
-    pestOverlayEl.querySelectorAll("span").forEach((p) => {
-      if (!p.parentNode) return;
-
-      const currentLeft = parseFloat(p.style.left) || 0;
-      const currentTop = parseFloat(p.style.top) || 0;
-      const dx = parseFloat(p.dataset.dx) || 0;
-      const dy = parseFloat(p.dataset.dy) || 0;
-
-      const newLeft = Math.max(0, Math.min(width - 40, currentLeft + dx));
-      const newTop = Math.max(0, Math.min(height - 40, currentTop + dy));
-
-      p.style.left = newLeft + "px";
-      p.style.top = newTop + "px";
-    });
-  }, 80);
 
   // Start spawning
   const spawnInterval = setInterval(() => {
@@ -1302,7 +1344,6 @@ function startPestMinigame(
 function finishPestMinigame(type, missed, swatted, total, pestType) {
   // Clean up UI
   if (pestOverlayEl) {
-    pestOverlayEl.style.display = "none";
     pestOverlayEl.innerHTML = "";
   }
 
@@ -1310,26 +1351,164 @@ function finishPestMinigame(type, missed, swatted, total, pestType) {
   clearTimeout(pestTimerId);
   pestUIActive = false;
 
-  // Calculate results (keep mysterious)
-  const missedRate = missed / Math.max(1, total);
+  // Calculate missed as total - swatted (more reliable than animation-based counting)
+  const actualMissed = total - swatted;
   const successRate = swatted / Math.max(1, total);
+  const missedRate = actualMissed / Math.max(1, total);
 
-  // Apply penalties based on performance (silently)
-  if (missed > 0) {
-    const penalty = Math.min(0.25, missedRate * 0.3); // Max 25% penalty
+  // Calculate penalty based on missed bugs (each missed bug = 2.5% penalty, max 25%)
+  let penaltyPercent = 0;
+  if (actualMissed > 0) {
+    penaltyPercent = Math.min(25, actualMissed * 2.5);
+    penaltyPercent = Math.round(penaltyPercent);
 
     if (type === "pest") {
-      plant.pestPenalty *= 1 - penalty;
-      // Keep it mysterious - no specific feedback
-      addEventToLog("The pests have been dealt with.", "info");
+      plant.pestPenalty *= 1 - (penaltyPercent / 100);
     }
-  } else if (successRate > 0.8) {
+  }
+
+  // Show results popup over the plant container
+  showPestResultsPopup(swatted, total, penaltyPercent, successRate);
+
+  // Also add to event log
+  if (missed === 0 && successRate > 0.8) {
     addEventToLog("Excellent pest control!", "info");
+  } else if (penaltyPercent > 0) {
+    addEventToLog(`Pests dealt with. -${penaltyPercent}% potency.`, "warning");
   } else {
     addEventToLog("Pest situation resolved.", "info");
   }
 
   pestActive = false;
+}
+
+// Show a popup with pest mini-game results
+function showPestResultsPopup(swatted, total, penaltyPercent, successRate) {
+  const plantContainer = document.querySelector(".plantImageContainer");
+  if (!plantContainer) return;
+
+  // Create popup element
+  const popup = document.createElement("div");
+  popup.className = "pestResultsPopup";
+
+  // Determine result message and color
+  let resultText, resultClass;
+  if (successRate >= 0.9) {
+    resultText = "PERFECT!";
+    resultClass = "perfect";
+  } else if (successRate >= 0.7) {
+    resultText = "GOOD!";
+    resultClass = "good";
+  } else if (successRate >= 0.5) {
+    resultText = "OK";
+    resultClass = "ok";
+  } else {
+    resultText = "OUCH!";
+    resultClass = "bad";
+  }
+
+  popup.innerHTML = `
+    <div class="pestResultTitle ${resultClass}">${resultText}</div>
+    <div class="pestResultStats">
+      <div class="pestResultRow">${swatted}/${total} SWATTED</div>
+      ${penaltyPercent > 0 ? `<div class="pestResultRow penalty">-${penaltyPercent}% POTENCY</div>` : `<div class="pestResultRow bonus">NO DAMAGE!</div>`}
+    </div>
+  `;
+
+  // Add styles if not already added
+  if (!document.getElementById("pestResultsStyles")) {
+    const style = document.createElement("style");
+    style.id = "pestResultsStyles";
+    style.textContent = `
+      .pestResultsPopup {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        width: 40%;
+        background: #000000;
+        border: 2px solid #00ff41;
+        border-radius: 6px;
+        padding: 6px;
+        z-index: 10001;
+        text-align: center;
+        font-family: 'Press Start 2P', monospace;
+        animation: pestPopupIn 0.4s ease-out forwards;
+        box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+      }
+      
+      @keyframes pestPopupIn {
+        0% {
+          transform: scale(0.5);
+          opacity: 0;
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      
+      @keyframes pestPopupOut {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(0.5);
+          opacity: 0;
+        }
+      }
+      
+      .pestResultTitle {
+        font-size: 0.9em;
+        margin-bottom: 8px;
+        text-shadow: 0 0 10px currentColor;
+      }
+      
+      .pestResultTitle.perfect { color: #00ff41; }
+      .pestResultTitle.good { color: #7fff00; }
+      .pestResultTitle.ok { color: #ffd700; }
+      .pestResultTitle.bad { color: #ff4444; }
+      
+      .pestResultStats {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .pestResultRow {
+        font-size: 0.5em;
+        color: #ffffff;
+      }
+      
+      .pestResultRow.penalty {
+        color: #ff4444;
+      }
+      
+      .pestResultRow.bonus {
+        color: #00ff41;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // Add to plant container
+  plantContainer.appendChild(popup);
+
+  // Hide overlay now that popup is showing
+  if (pestOverlayEl) {
+    pestOverlayEl.style.display = "none";
+  }
+
+  // Remove popup after delay
+  setTimeout(() => {
+    popup.style.animation = "pestPopupOut 0.3s ease-out forwards";
+    setTimeout(() => {
+      if (popup.parentNode) popup.remove();
+    }, 300);
+  }, 2500);
 }
 
 function showRaiderEvent() {
@@ -1362,23 +1541,202 @@ function showRaiderEvent() {
 }
 
 function showNutrientEvent() {
+  // Don't spawn if one is already active
+  if (nutrientActive) return;
+
   nutrientActive = true;
-  addEventToLog("Nutrient boost available!", "info");
+  addEventToLog("Nutrient bubble incoming! Click to collect!", "info");
 
-  // Random chance to get a nutrient boost
-  const boostSuccess = Math.random() < 0.5; // 50% chance to get boost
+  // Weighted random: 70% chance for 1-3%, 20% for 3-6%, 10% for 8-15%
+  let boostPercent;
+  const roll = Math.random();
+  if (roll < 0.85) {
+    boostPercent = Math.floor(Math.random() * 3) + 1; // 1-3% (85% chance)
+  } else if (roll < 0.97) {
+    boostPercent = Math.floor(Math.random() * 3) + 4; // 4-6% (12% chance)
+  } else {
+    boostPercent = Math.floor(Math.random() * 5) + 10; // 10-15% (3% chance - rare!)
+  }
 
-  setTimeout(function () {
-    if (boostSuccess) {
-      const boostPercent = Math.floor(Math.random() * 10) + 5; // Random boost between 5-15%
-      plant.potencyBoost *= 1 + boostPercent / 100;
-      addEventToLog(
-        `Nutrient boost applied! Potency increased by ${boostPercent}%.`,
-        "info"
-      );
-    } else {
-      addEventToLog("Nutrient boost opportunity missed.", "info");
-    }
+  // Create the nutrient bubble
+  spawnNutrientBubble(boostPercent);
+}
+
+function spawnNutrientBubble(boostPercent) {
+  const plantContainer = document.querySelector(".plantImageContainer");
+  if (!plantContainer) {
     nutrientActive = false;
-  }, 5000);
+    return;
+  }
+
+  // Clean up any existing bubbles first
+  const existingBubbles = plantContainer.querySelectorAll(".nutrient-bubble");
+  existingBubbles.forEach(b => b.remove());
+
+  // Create bubble element
+  const bubble = document.createElement("div");
+  bubble.className = "nutrient-bubble";
+  bubble.innerHTML = `+${boostPercent}%`;
+  bubble.dataset.boost = boostPercent;
+
+  // Random horizontal position
+  const containerWidth = plantContainer.offsetWidth;
+  const randomX = Math.floor(Math.random() * (containerWidth - 60)) + 10;
+  bubble.style.left = `${randomX}px`;
+  bubble.style.bottom = "-50px";
+
+  // Higher boost = faster rise (faster overall: 2-4 seconds)
+  const riseDuration = Math.max(2, 4 - (boostPercent * 0.15));
+  bubble.style.animationDuration = `${riseDuration}s, 0.8s`;
+
+  // Click handler
+  bubble.onclick = function (e) {
+    e.stopPropagation();
+    collectNutrientBubble(bubble, boostPercent, riseDuration);
+  };
+
+  // Add styles if not present
+  if (!document.getElementById("nutrientBubbleStyles")) {
+    const style = document.createElement("style");
+    style.id = "nutrientBubbleStyles";
+    style.textContent = `
+      .nutrient-bubble {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background: radial-gradient(circle at 30% 30%, #4da6ff, #0066cc);
+        border: 3px solid #00ccff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Press Start 2P', monospace;
+        font-size: 0.5em;
+        color: white;
+        text-shadow: 0 0 5px #000;
+        cursor: pointer;
+        z-index: 9999;
+        box-shadow: 0 0 20px rgba(0, 200, 255, 0.6), inset 0 -10px 20px rgba(0,0,0,0.3);
+        animation: bubbleRise 6s linear forwards, bubbleWobble 0.8s ease-in-out infinite;
+      }
+      
+      .nutrient-bubble:hover {
+        transform: scale(1.2);
+        box-shadow: 0 0 30px rgba(0, 200, 255, 0.9), inset 0 -10px 20px rgba(0,0,0,0.3);
+      }
+      
+      @keyframes bubbleRise {
+        0% { bottom: -50px; }
+        100% { bottom: calc(100% + 50px); }
+      }
+      
+      @keyframes bubbleWobble {
+        0%, 100% { margin-left: -5px; }
+        50% { margin-left: 5px; }
+      }
+      
+      .nutrient-bubble.collected {
+        animation: bubblePop 0.3s ease-out forwards !important;
+      }
+      
+      @keyframes bubblePop {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.5); opacity: 0.5; }
+        100% { transform: scale(0); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  plantContainer.appendChild(bubble);
+
+  // Remove bubble after animation completes (missed)
+  setTimeout(function () {
+    if (bubble.parentNode && !bubble.classList.contains("collected")) {
+      bubble.remove();
+      addEventToLog("Nutrient bubble escaped!", "warning");
+      nutrientActive = false;
+    }
+  }, riseDuration * 1000);
+}
+
+function collectNutrientBubble(bubble, boostPercent, fallDuration) {
+  if (bubble.classList.contains("collected")) return;
+
+  bubble.classList.add("collected");
+
+  // Apply the boost
+  plant.potencyBoost *= 1 + boostPercent / 100;
+  addEventToLog(`Nutrient boost collected! +${boostPercent}% Potency!`, "info");
+
+  // Show collection feedback
+  showNutrientCollectedPopup(boostPercent);
+
+  // Remove bubble and reset state immediately
+  if (bubble.parentNode) bubble.remove();
+  nutrientActive = false;
+}
+
+function showNutrientCollectedPopup(boostPercent) {
+  const plantContainer = document.querySelector(".plantImageContainer");
+  if (!plantContainer) return;
+
+  const popup = document.createElement("div");
+  popup.className = "nutrientCollectedPopup";
+  popup.innerHTML = `
+    <div class="nutrientTitle">COLLECTED!</div>
+    <div class="nutrientBoost">+${boostPercent}% POTENCY</div>
+  `;
+
+  // Add styles if not present
+  if (!document.getElementById("nutrientPopupStyles")) {
+    const style = document.createElement("style");
+    style.id = "nutrientPopupStyles";
+    style.textContent = `
+      .nutrientCollectedPopup {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        width: 40%;
+        background: #000000;
+        border: 2px solid #00ccff;
+        border-radius: 6px;
+        padding: 6px;
+        z-index: 10001;
+        text-align: center;
+        font-family: 'Press Start 2P', monospace;
+        animation: nutrientPopIn 0.4s ease-out forwards;
+        box-shadow: 0 0 15px rgba(0, 200, 255, 0.5);
+      }
+      
+      @keyframes nutrientPopIn {
+        0% { transform: scale(0.5); opacity: 0; }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      
+      .nutrientTitle {
+        font-size: 0.8em;
+        color: #00ccff;
+        margin-bottom: 5px;
+        text-shadow: 0 0 10px #00ccff;
+      }
+      
+      .nutrientBoost {
+        font-size: 0.6em;
+        color: #00ff41;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  plantContainer.appendChild(popup);
+
+  // Close popup after 800ms (faster)
+  setTimeout(function () {
+    popup.style.animation = "nutrientPopIn 0.2s ease-out reverse forwards";
+    setTimeout(function () {
+      if (popup.parentNode) popup.remove();
+    }, 200);
+  }, 800);
 }
