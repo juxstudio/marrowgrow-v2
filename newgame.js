@@ -1180,6 +1180,10 @@ async function showGROWLABInterface() {
 
     // Check badges once on login to catch up any missed popups
     await safeCheckAndAwardBadges();
+
+    // Initialize grown seeds from PlayFab so vault reveals work correctly
+    // (This was previously only called when opening the Vault, causing grown seeds to not show as revealed)
+    await initializeGrownSeeds();
   } else {
     console.error("mainGameScreen element not found!");
   }
