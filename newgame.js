@@ -1161,6 +1161,9 @@ async function showGROWLABInterface() {
     mainGameScreen.style.display = "flex"; // Use flex instead of block to match CSS
     console.log("GROWLAB interface is now visible");
 
+    // Initialize hotspots/navigation so the scene is clickable after login
+    initializeHotspotUI();
+
     //Update Game Header
 
     updateGameHeader();
@@ -4715,33 +4718,52 @@ async function checkAndAwardBadges() {
 
     // Get player progress from PlayFab Internal Data
     console.log("🏆 [DEBUG] Getting player progress from PlayFab...");
-    const playerProgressData = await new Promise((resolve, reject) => {
-      PlayFab.ClientApi.ExecuteCloudScript(
-        { FunctionName: "getPlayerProgress", FunctionParameter: {} },
-        (result, error) => {
-          if (error) {
-            reject(error);
-            return;
-          }
-          resolve(result.data);
-        }
-      );
-    });
-
     let playerProgress = {
       totalGrows: 0,
       badges: [],
       badgePopupsShown: [],
+      grownStrains: [],
       currentTier: 1,
+      consecutiveLogins: 0,
+      lastLoginDate: null,
+      weekendStreaks: 0,
+      lastWeekendDate: null,
+      slotsWins: 0,
+      seedsUnlocked: 6,
       totalYield: 0,
+      perfectGrows: 0,
+      actOfGodSurvived: 0,
+      fastestGrow: null,
+      highestPotency: 0,
+      highestWeight: 0,
+      totalHarvests: 0,
+      optimalFeedings: 0,
+      highRiskSeeds: 0,
+      perfectCombos: 0,
+      yieldsOver100: 0,
+      potencyOver95: 0,
     };
 
-    if (playerProgressData && playerProgressData.playerProgress) {
-      playerProgress = playerProgressData.playerProgress;
-      // Ensure badgePopupsShown exists (for existing players)
-      if (!playerProgress.badgePopupsShown) {
-        playerProgress.badgePopupsShown = [];
+    try {
+      const playerProgressResult = await PlayFabService.executeCloudScript(
+        "getPlayerProgress",
+        {}
+      );
+
+      if (playerProgressResult && playerProgressResult.playerProgress) {
+        // Merge server state onto defaults to avoid dropping fields (e.g., grownStrains)
+        playerProgress = {
+          ...playerProgress,
+          ...playerProgressResult.playerProgress,
+        };
       }
+    } catch (err) {
+      console.warn("Could not load player progress for badge check:", err);
+    }
+
+    // Ensure badgePopupsShown exists (for existing players)
+    if (!playerProgress.badgePopupsShown) {
+      playerProgress.badgePopupsShown = [];
     }
 
     console.log("🏆 [DEBUG] Player progress:", playerProgress);
