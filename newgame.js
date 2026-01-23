@@ -4817,20 +4817,15 @@ async function checkAndAwardBadges() {
           newlyAwardedBadges.push(badgeId);
         }
 
-        // *** KEY FIX: Check current unlock status AFTER potential awarding ***
+        // Show popup only if unlocked AND popup not already shown
         const isNowUnlocked = playerProgress.badges.includes(badgeId);
-
-        // Show popup if badge is unlocked (either newly awarded or previously) but popup hasn't been shown
-        // TEMPORARY: Ignore popup already shown flag for testing
-        if (isNowUnlocked) {
+        const needsPopup = isNowUnlocked && !popupAlreadyShown;
+        if (needsPopup) {
           console.log(
-            `🎉 [DEBUG] Badge popup needed for: ${badgeId} (ignoring popup already shown flag)`
+            `🎉 [DEBUG] Badge popup needed for: ${badgeId} (not shown yet)`
           );
           badgesToShowPopup.push(badgeId);
-          // Mark popup as shown
-          if (!playerProgress.badgePopupsShown.includes(badgeId)) {
-            playerProgress.badgePopupsShown.push(badgeId);
-          }
+          playerProgress.badgePopupsShown.push(badgeId);
         }
       });
 
