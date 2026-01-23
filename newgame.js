@@ -2409,6 +2409,9 @@ function checkAndUnlockSeeds() {
 // Uses playerProgress.grownStrains from Internal Data (set by cloud script)
 async function initializeGrownSeeds() {
   try {
+    // Preserve any locally recorded grown seeds (e.g., just finished a run)
+    const localGrown = { ...grownSeeds };
+
     // Get player progress from cloud script which contains grownStrains
     const result = await new Promise((resolve, reject) => {
       PlayFab.ClientApi.ExecuteCloudScript(
@@ -2424,20 +2427,22 @@ async function initializeGrownSeeds() {
     });
 
     if (result?.FunctionResult?.success && result?.FunctionResult?.playerProgress?.grownStrains) {
-      // Convert array to object for consistent lookup
+      // Convert array to object for consistent lookup and merge with local session state
       const grownArray = result.FunctionResult.playerProgress.grownStrains;
-      grownSeeds = {};
-      grownArray.forEach(seedKey => {
+      grownSeeds = { ...localGrown };
+      grownArray.forEach((seedKey) => {
         grownSeeds[seedKey] = true;
       });
       console.log(`🌸 Loaded ${grownArray.length} grown seeds from playerProgress.grownStrains`);
     } else {
-      grownSeeds = {};
-      console.log('🌱 No grown strains found in playerProgress');
+      // Keep local session seeds if server has none yet (avoid wiping just-grown state)
+      grownSeeds = { ...localGrown };
+      console.log('🌱 No grown strains found in playerProgress (preserving local session seeds)');
     }
   } catch (error) {
     console.warn('Failed to load grown seeds from playerProgress:', error);
-    grownSeeds = {};
+    // Preserve local state on error
+    grownSeeds = { ...grownSeeds };
   }
 }
 
