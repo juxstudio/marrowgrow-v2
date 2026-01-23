@@ -1302,6 +1302,10 @@ function handleLogout() {
 
     // Reset game state
     currentGrower = null;
+    grownSeeds = {};
+    grownSeedsOwner = null;
+    unlockedSeeds = {};
+    window.gameScoresSubmitted = false;
 
     // Clear any running seed timer
     if (window.seedTimer) {
@@ -2281,6 +2285,7 @@ let unlockedSeeds = {};
 
 // Tracks which seed types the player has successfully grown (for revealing flower images)
 let grownSeeds = {};
+let grownSeedsOwner = null;
 const seedUnlockThresholds = [
   0, // 1st seed - always unlocked
   0, // 2nd seed - always unlocked
@@ -2409,8 +2414,10 @@ function checkAndUnlockSeeds() {
 // Uses playerProgress.grownStrains from Internal Data (set by cloud script)
 async function initializeGrownSeeds() {
   try {
-    // Preserve any locally recorded grown seeds (e.g., just finished a run)
-    const localGrown = { ...grownSeeds };
+    // Preserve session-grown seeds only if the same user is active
+    const activeUser = currentGrower || PlayFabService.getSession();
+    const localGrown =
+      grownSeedsOwner && grownSeedsOwner === activeUser ? { ...grownSeeds } : {};
 
     // Get player progress from cloud script which contains grownStrains
     const result = await new Promise((resolve, reject) => {
@@ -2439,6 +2446,7 @@ async function initializeGrownSeeds() {
       grownSeeds = { ...localGrown };
       console.log('🌱 No grown strains found in playerProgress (preserving local session seeds)');
     }
+    grownSeedsOwner = activeUser || null;
   } catch (error) {
     console.warn('Failed to load grown seeds from playerProgress:', error);
     // Preserve local state on error
