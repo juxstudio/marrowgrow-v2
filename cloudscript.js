@@ -1,4 +1,13 @@
 // Enhanced submitScore handler - replaces your existing one
+// Helper to group days into consistent weeks (Monday-based) so each weekend only counts once
+function getUtcWeekIndex(date) {
+  var day = (date.getUTCDay() + 6) % 7; // Monday = 0 ... Sunday = 6
+  var monday = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() - day)
+  );
+  return Math.floor(monday.getTime() / (7 * 24 * 60 * 60 * 1000));
+}
+
 handlers.submitScore = function (args, context) {
   try {
     var scoreType = args.scoreType;
@@ -121,6 +130,7 @@ handlers.submitScore = function (args, context) {
       lastLoginDate: null,
       weekendStreaks: 0,
       lastWeekendDate: null,
+      lastWeekendIndex: null,
       slotsWins: 0,
       seedsUnlocked: 6,
       totalYield: 0,
@@ -173,23 +183,30 @@ handlers.submitScore = function (args, context) {
     }
     playerProgress.lastLoginDate = today;
 
-    // Track weekend streaks
+    // Track weekend streaks (count once per weekend, not per weekend day)
     if (dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0) {
-      if (playerProgress.lastWeekendDate) {
-        var lastWeekend = new Date(playerProgress.lastWeekendDate);
-        var weeksDiff = Math.floor(
-          (now - lastWeekend) / (1000 * 60 * 60 * 24 * 7)
-        );
+      var currentWeekIndex = getUtcWeekIndex(now);
+      var lastWeekIndex = playerProgress.lastWeekendIndex;
 
-        if (weeksDiff <= 1) {
+      if (lastWeekIndex === undefined || lastWeekIndex === null) {
+        playerProgress.weekendStreaks = 1;
+      } else {
+        var weeksDiff = currentWeekIndex - lastWeekIndex;
+        if (weeksDiff === 0) {
+          // Same weekend, do not increment
+        } else if (weeksDiff === 1) {
           playerProgress.weekendStreaks++;
+        } else if (weeksDiff > 1) {
+          // Missed a weekend, reset streak
+          playerProgress.weekendStreaks = 1;
         } else {
+          // Time-travel or data reset, restart streak
           playerProgress.weekendStreaks = 1;
         }
-      } else {
-        playerProgress.weekendStreaks = 1;
       }
-      playerProgress.lastWeekendDate = today;
+
+      playerProgress.lastWeekendIndex = currentWeekIndex;
+      playerProgress.lastWeekendDate = today; // kept for backward compatibility
     }
 
     var newBadges = [];
@@ -235,14 +252,32 @@ handlers.submitScore = function (args, context) {
         playerProgress.yieldsOver100++;
       }
 
-      // Track fastest grow (in seconds)
-      if (gameState.totalGrowthTime) {
-        var growTimeSeconds = gameState.totalGrowthTime * 60; // Convert from minutes
+      // Track fastest grow (store in milliseconds, prefer real elapsed if provided)
+      var growDurationMs = null;
+      if (args.gameState && args.gameState.actualDurationMs) {
+        growDurationMs = args.gameState.actualDurationMs;
+      } else if (
+        args.gameState &&
+        args.gameState.runStartedAt &&
+        args.gameState.runFinishedAt
+      ) {
+        growDurationMs =
+          args.gameState.runFinishedAt - args.gameState.runStartedAt;
+      } else if (gameState.totalGrowthTime) {
+        // Fallback: assume totalGrowthTime is in seconds and convert to ms
+        growDurationMs = gameState.totalGrowthTime * 1000;
+      }
+
+      if (
+        growDurationMs &&
+        growDurationMs > 0 &&
+        growDurationMs < 1000 * 60 * 60 * 24 // ignore extreme/invalid values
+      ) {
         if (
           !playerProgress.fastestGrow ||
-          growTimeSeconds < playerProgress.fastestGrow
+          growDurationMs < playerProgress.fastestGrow
         ) {
-          playerProgress.fastestGrow = growTimeSeconds;
+          playerProgress.fastestGrow = growDurationMs;
         }
       }
 
@@ -539,6 +574,7 @@ handlers.cleanupUserData = function (args, context) {
         lastLoginDate: null,
         weekendStreaks: 0,
         lastWeekendDate: null,
+        lastWeekendIndex: null,
         slotsWins: 0,
         seedsUnlocked: 6, // Keep seed unlocks
         totalYield: 0,

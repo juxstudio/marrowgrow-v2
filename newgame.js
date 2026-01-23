@@ -2255,6 +2255,9 @@ let plant = {
     flowering: { waterTimes: 0, nutrientMix: null },
   },
   scoresRecorded: false,
+  runStartedAt: null,
+  runFinishedAt: null,
+  actualDurationMs: null,
   defenseType: null,
   deathTicks: 0,
 };
@@ -2638,6 +2641,9 @@ function resetPlantState() {
       flowering: { waterTimes: 0, nutrientMix: null },
     },
     scoresRecorded: false,
+    runStartedAt: null,
+    runFinishedAt: null,
+    actualDurationMs: null,
     lastWaterTime: 0,
     lastFeedTime: 0,
     overWatered: false,
@@ -3181,6 +3187,9 @@ function initializeGameSimulation() {
   plant.totalGrowthTime = growthStages
     .slice(0, -1)
     .reduce((sum, stage) => sum + stage.time, 0);
+  plant.runStartedAt = Date.now();
+  plant.runFinishedAt = null;
+  plant.actualDurationMs = null;
 
   // Set initial optimal light
   plant.optimalLight = Math.floor(Math.random() * 61) + 30;
@@ -4317,10 +4326,17 @@ async function showHarvestScreen() {
         console.error("Screenshot failed:", error);
         alert("Failed to capture screenshot");
       }
-    });
+  });
 
   // Submit scores to PlayFab leaderboards - prevent re-submissions
   if (!plant.scoresRecorded) {
+    if (!plant.runFinishedAt) {
+      plant.runFinishedAt = Date.now();
+    }
+    if (!plant.actualDurationMs && plant.runStartedAt) {
+      plant.actualDurationMs = plant.runFinishedAt - plant.runStartedAt;
+    }
+
     console.log("Submitting scores for the first time");
     await submitScores(finalPotency, finalWeight);
     plant.scoresRecorded = true;
@@ -4741,6 +4757,7 @@ async function checkAndAwardBadges() {
       lastLoginDate: null,
       weekendStreaks: 0,
       lastWeekendDate: null,
+      lastWeekendIndex: null,
       slotsWins: 0,
       seedsUnlocked: 6,
       totalYield: 0,
@@ -5243,7 +5260,10 @@ function getProgressText(requirement, playerProgress) {
     requirement.type,
     playerProgress
   );
-  const targetValue = requirement.value;
+  let targetValue = requirement.value;
+  if (requirement.type === "fastestGrow") {
+    targetValue = Math.round(requirement.value / 1000); // display seconds
+  }
   const unit = getRequirementUnit(requirement.type);
 
   return `Progress: ${currentValue} / ${targetValue} ${unit}`;
@@ -5269,7 +5289,9 @@ function getCurrentProgressValue(requirementType, playerProgress) {
     case "actOfGodSurvived":
       return playerProgress.actOfGodSurvived || 0;
     case "fastestGrow":
-      return Math.round((playerProgress.fastestGrow || Infinity) / 1000); // Convert to seconds
+      return playerProgress.fastestGrow
+        ? Math.round(playerProgress.fastestGrow / 1000) // Convert to seconds
+        : 0;
     case "efficientDays":
       return playerProgress.efficientDays || 0;
     case "hardestCombo":
